@@ -9,11 +9,14 @@ import {
 import LoginForm from "./components/LoginForm.jsx";
 import SignupForm from "./components/SignupForm.jsx";
 
-const router = createBrowserRouter(routes, { basename: "/SaldoSiaga" }, [
-  { path: "/", element: <a href="/login">click here!</a> },
-  { path: "/login", element: <LoginForm /> },
-  { path: "/signup", element: <SignupForm /> },
-]);
+const router = createBrowserRouter(
+  [
+    { path: "/", element: <a href="/login">click here to login!</a> },
+    { path: "/login", element: <LoginForm /> },
+    { path: "/signup", element: <SignupForm /> },
+  ],
+  { basename: "/SaldoSiaga" }
+);
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
