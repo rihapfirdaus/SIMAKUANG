@@ -12,8 +12,8 @@ import SignupForm from "./components/SignupForm.jsx";
 const router = createBrowserRouter(
   [
     { path: "/", element: <a href="/login">click here to login!</a> },
-    { path: "/login", element: <LoginForm /> },
-    { path: "/signup", element: <SignupForm /> },
+    { path: "/SaldoSiaga/login", element: <LoginForm /> },
+    { path: "/SaldoSiaga/signup", element: <SignupForm /> },
   ],
   { basename: "/SaldoSiaga" }
 );
