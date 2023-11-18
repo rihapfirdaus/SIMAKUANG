@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router } from "react-router-dom";
+import Carousel from "./components/Carousel.jsx";
 import LoginForm from "./components/LoginForm";
 import SignupForm from "./components/SignupForm";
 import { Routes, Route } from "react-router-dom";
@@ -10,7 +11,7 @@ function App() {
       <div>
         <section>
           <Routes>
-            <Route path="/" element={<LoginForm />}></Route>
+            <Route path="/" element={<Carousel />}></Route>
             <Route path="/login" element={<LoginForm />} />
             <Route path="/signup" element={<SignupForm />} />
           </Routes>
