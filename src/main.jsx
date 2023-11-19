@@ -5,16 +5,17 @@ import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import LoginComp from "./components/LoginComp.jsx";
 import SignupComp from "./components/SignupComp.jsx";
 
+const basename = process.env.PUBLIC_URL;
 const router = createBrowserRouter(
   [
     {
       path: "/",
-      element: <a href="/SaldoSiaga/login">click here to login!</a>,
+      element: <a href="/login">click here to login!</a>,
     },
     { path: "/login", element: <LoginComp /> },
     { path: "/signup", element: <SignupComp /> },
   ],
-  { basename: "/SaldoSiaga" }
+  { basename: basename }
 );
 
 ReactDOM.createRoot(document.getElementById("root")).render(
