@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import Users from "./UserModel";
+import Users from "./UserModel.js";
 
 const Debt = mongoose.Schema({
   userId: {

@@ -5,7 +5,7 @@ import {
   saveDebt,
   updateDebt,
   deleteDebt,
-} from "../controller/SaveController";
+} from "../controllers/DebtController.js";
 
 const router = express.Router();
 

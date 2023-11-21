@@ -8,6 +8,8 @@ import ExpenseRoute from "./routes/ExpenseRoute.js";
 import DebtRoute from "./routes/DebtRoute.js";
 import SavingRoute from "./routes/SavingRoute.js";
 
+dotenv.config();
+
 const uri = process.env.MONGODB_URI;
 const app = express();
 mongoose.connect(uri);
