@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { VisibilityOff, Visibility } from "@mui/icons-material";
-import { Link } from "react-router-dom";
-import { Form } from "react-router-dom";
+import { Link, Form } from "react-router-dom";
 import AppsIcon from "../utils/AppsIcon";
 import { Google } from "@mui/icons-material";
 import { createTheme, textFieldClasses } from "@mui/material";

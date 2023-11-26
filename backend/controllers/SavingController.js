@@ -1,6 +1,6 @@
-import Saving from "../models/SavingModel.js";
+const Saving = require("../models/SavingModel.js");
 
-export const getSavings = async (req, res) => {
+exports.getSavings = async (req, res) => {
   try {
     const userId = req.params.userId;
     const savings = await Saving.find({ userId });
@@ -10,7 +10,7 @@ export const getSavings = async (req, res) => {
   }
 };
 
-export const getSavingById = async (req, res) => {
+exports.getSavingById = async (req, res) => {
   try {
     const userId = req.params.userId;
     const saving = await Saving.findOne({
@@ -27,7 +27,7 @@ export const getSavingById = async (req, res) => {
   }
 };
 
-export const saveSaving = async (req, res) => {
+exports.saveSaving = async (req, res) => {
   const { lender, amount, dueDate, status, note } = req.body;
   const userId = req.params.userId;
 
@@ -48,7 +48,7 @@ export const saveSaving = async (req, res) => {
   }
 };
 
-export const updateSaving = async (req, res) => {
+exports.updateSaving = async (req, res) => {
   const { lender, amount, dueDate, status, note } = req.body;
   const userId = req.params.userId;
 
@@ -69,7 +69,7 @@ export const updateSaving = async (req, res) => {
   }
 };
 
-export const deleteSaving = async (req, res) => {
+exports.deleteSaving = async (req, res) => {
   try {
     const userId = req.params.userId;
     const deletedSaving = await Saving.findOneAndDelete({

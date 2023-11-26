@@ -1,5 +1,5 @@
-import express from "express";
-import {
+const express = require("express");
+const {
   getExpenses,
   getExpenseById,
   getExpensesByMonth,
@@ -8,7 +8,7 @@ import {
   saveExpense,
   updateExpense,
   deleteExpense,
-} from "../controllers/ExpenseController.js";
+} = require("../controllers/ExpenseController.js");
 const router = express.Router();
 
 router.get("/user/:userId/expense/:id", getExpenseById);
@@ -24,4 +24,4 @@ router.get(
   getExpensesByPeriod
 );
 
-export default router;
+module.exports = router;

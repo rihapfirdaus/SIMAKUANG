@@ -1,26 +1,29 @@
 import { auth } from "../services/firebase";
-import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
+import {
+  getAuth,
+  signInWithEmailAndPassword,
+  signInWithPopup,
+} from "firebase/auth";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { GoogleAuthProvider } from "firebase/auth";
+import { redirect } from "react-router-dom";
 
 const googleProvider = new GoogleAuthProvider();
 
-export const loginWithEmailAndPassword = (e, email, password) => {
-  e.preventDefault();
+export const loginWithEmailAndPassword = (email, password) => {
   signInWithEmailAndPassword(auth, email, password)
     .then((userCredential) => {
-      console.log(userCredential);
+      console.log("auth account succes");
     })
     .catch((error) => {
       console.log(error);
     });
 };
 
-export const signupWithEmailAndPassword = (e, email, password) => {
-  e.preventDefault();
+export const signupWithEmailAndPassword = (email, password) => {
   createUserWithEmailAndPassword(auth, email, password)
     .then((userCredential) => {
-      console.log(userCredential);
+      console.log("auth account succes");
     })
     .catch((error) => {
       console.log(error);
@@ -37,7 +40,9 @@ export const authWithGoogle = async () => {
     // const additionalUserInfo = result.additionalUserInfo;
 
     // Lanjutkan dengan langkah-langkah setelah berhasil login
-    console.log("Google Login Successful", user);
+
+    //simpan akses token ke local storage
+    localStorage.setItem("AccesToken", token);
   } catch (error) {
     // Handle Errors here.
     const errorCode = error.code;

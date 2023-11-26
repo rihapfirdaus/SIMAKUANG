@@ -1,6 +1,6 @@
-import Income from "../models/IncomeModel.js";
+const Income = require("../models/IncomeModel.js");
 
-export const getIncomes = async (req, res) => {
+exports.getIncomes = async (req, res) => {
   try {
     const userId = req.params.userId;
     const incomes = await Income.find({ userId });
@@ -10,7 +10,7 @@ export const getIncomes = async (req, res) => {
   }
 };
 
-export const getIncomeById = async (req, res) => {
+exports.getIncomeById = async (req, res) => {
   try {
     const userId = req.params.userId;
     const income = await Income.findOne({
@@ -27,7 +27,7 @@ export const getIncomeById = async (req, res) => {
   }
 };
 
-export const getIncomesByMonth = async (req, res) => {
+exports.getIncomesByMonth = async (req, res) => {
   const { userId, year, month } = req.params;
 
   try {
@@ -49,7 +49,7 @@ export const getIncomesByMonth = async (req, res) => {
   }
 };
 
-export const getIncomesByYear = async (req, res) => {
+exports.getIncomesByYear = async (req, res) => {
   const { userId, year } = req.params;
 
   try {
@@ -67,7 +67,7 @@ export const getIncomesByYear = async (req, res) => {
   }
 };
 
-export const getIncomesByPeriod = async (req, res) => {
+exports.getIncomesByPeriod = async (req, res) => {
   const { userId, startDate, endDate } = req.params;
 
   try {
@@ -85,7 +85,7 @@ export const getIncomesByPeriod = async (req, res) => {
   }
 };
 
-export const saveIncome = async (req, res) => {
+exports.saveIncome = async (req, res) => {
   const { amount, category, date, note } = req.body;
   const userId = req.params.userId;
 
@@ -105,7 +105,7 @@ export const saveIncome = async (req, res) => {
   }
 };
 
-export const updateIncome = async (req, res) => {
+exports.updateIncome = async (req, res) => {
   const { amount, category, date, note } = req.body;
   const userId = req.params.userId;
 
@@ -126,7 +126,7 @@ export const updateIncome = async (req, res) => {
   }
 };
 
-export const deleteIncome = async (req, res) => {
+exports.deleteIncome = async (req, res) => {
   try {
     const userId = req.params.userId;
     const deletedIncome = await Income.findOneAndDelete({

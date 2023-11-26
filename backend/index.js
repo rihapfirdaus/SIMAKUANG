@@ -1,30 +1,48 @@
-import express from "express";
-import mongoose from "mongoose";
-import cors from "cors";
-import dotenv from "dotenv";
-import UserRoute from "./routes/UserRoute.js";
-import IncomeRoute from "./routes/IncomeRoute.js";
-import ExpenseRoute from "./routes/ExpenseRoute.js";
-import DebtRoute from "./routes/DebtRoute.js";
-import SavingRoute from "./routes/SavingRoute.js";
+const express = require("express");
+const mongoose = require("mongoose");
+const cors = require("cors");
+const dotenv = require("dotenv");
+const { userRoute } = require("./routes/UserRoute.js");
+const { incomeRoute } = require("./routes/IncomeRoute.js");
+const { expenseRoute } = require("./routes/ExpenseRoute.js");
+const { savingRoute } = require("./routes/SavingRoute.js");
+const { debtRoute } = require("./routes/DebtRoute.js");
 
 dotenv.config();
 
-const uri = process.env.MONGODB_URI;
 const app = express();
+
+const uri = process.env.MONGODB_URI;
 mongoose.connect(uri);
 
 const db = mongoose.connection;
 db.on("error", (error) => console.log(error));
 db.once("open", () => console.log("database connected..."));
 
-app.use(cors());
+const corsOptions = {
+  origin: ["https://saldosiaga.firebaseapp.com", "http://localhost:5173"],
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  credentials: true,
+  optionsSuccessStatus: 204,
+};
+app.use(cors(corsOptions));
+
 app.use(express.json());
 
-app.use(UserRoute);
-app.use(IncomeRoute);
-app.use(ExpenseRoute);
-app.use(DebtRoute);
-app.use(SavingRoute);
+app.use(userRoute);
+app.use(incomeRoute);
+app.use(expenseRoute);
+app.use(savingRoute);
+app.use(debtRoute);
 
-app.listen(5000, () => console.log("Server up and running"));
+process.on("SIGINT", () => {
+  mongoose.connection.close(() => {
+    console.log("MongoDB connection closed.");
+    process.exit(0);
+  });
+});
+
+const port = process.env.PORT || 5000;
+const server = app.listen(port, () =>
+  console.log(`Server up and running on port ${port}`)
+);

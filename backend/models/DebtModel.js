@@ -1,5 +1,5 @@
-import mongoose from "mongoose";
-import Users from "./UserModel.js";
+const mongoose = require("mongoose");
+const Users = require("./UserModel.js");
 
 const Debt = mongoose.Schema({
   userId: {
@@ -30,4 +30,4 @@ const Debt = mongoose.Schema({
   },
 });
 
-export default mongoose.model("Debts", Debt);
+module.exports = mongoose.model("Debts", Debt);

@@ -1,6 +1,6 @@
-import Debt from "../models/DebtModel.js";
+const Debt = require("../models/DebtModel.js");
 
-export const getDebts = async (req, res) => {
+exports.getDebts = async (req, res) => {
   try {
     const userId = req.params.userId;
     const debts = await Debt.find({ userId });
@@ -10,7 +10,7 @@ export const getDebts = async (req, res) => {
   }
 };
 
-export const getDebtById = async (req, res) => {
+exports.getDebtById = async (req, res) => {
   try {
     const userId = req.params.userId;
     const debt = await Debt.findOne({
@@ -27,7 +27,7 @@ export const getDebtById = async (req, res) => {
   }
 };
 
-export const saveDebt = async (req, res) => {
+exports.saveDebt = async (req, res) => {
   const { lender, amount, dueDate, status, note } = req.body;
   const userId = req.params.userId;
 
@@ -48,7 +48,7 @@ export const saveDebt = async (req, res) => {
   }
 };
 
-export const updateDebt = async (req, res) => {
+exports.updateDebt = async (req, res) => {
   const { lender, amount, dueDate, status, note } = req.body;
   const userId = req.params.userId;
 
@@ -69,7 +69,7 @@ export const updateDebt = async (req, res) => {
   }
 };
 
-export const deleteDebt = async (req, res) => {
+exports.deleteDebt = async (req, res) => {
   try {
     const userId = req.params.userId;
     const deletedDebt = await Debt.findOneAndDelete({

@@ -1,6 +1,6 @@
-import Expense from "../models/ExpenseModel.js";
+const Expense = require("../models/ExpenseModel.js");
 
-export const getExpenses = async (req, res) => {
+exports.getExpenses = async (req, res) => {
   try {
     const userId = req.params.userId;
     const expenses = await Expense.find({ userId });
@@ -10,7 +10,7 @@ export const getExpenses = async (req, res) => {
   }
 };
 
-export const getExpenseById = async (req, res) => {
+exports.getExpenseById = async (req, res) => {
   try {
     const userId = req.params.userId;
     const expense = await Expense.findOne({
@@ -27,7 +27,7 @@ export const getExpenseById = async (req, res) => {
   }
 };
 
-export const getExpensesByMonth = async (req, res) => {
+exports.getExpensesByMonth = async (req, res) => {
   const { userId, year, month } = req.params;
 
   try {
@@ -49,7 +49,7 @@ export const getExpensesByMonth = async (req, res) => {
   }
 };
 
-export const getExpensesByYear = async (req, res) => {
+exports.getExpensesByYear = async (req, res) => {
   const { userId, year } = req.params;
 
   try {
@@ -67,7 +67,7 @@ export const getExpensesByYear = async (req, res) => {
   }
 };
 
-export const getExpensesByPeriod = async (req, res) => {
+exports.getExpensesByPeriod = async (req, res) => {
   const { userId, startDate, endDate } = req.params;
 
   try {
@@ -85,7 +85,7 @@ export const getExpensesByPeriod = async (req, res) => {
   }
 };
 
-export const saveExpense = async (req, res) => {
+exports.saveExpense = async (req, res) => {
   const { amount, category, date, note } = req.body;
   const userId = req.params.userId;
 
@@ -105,7 +105,7 @@ export const saveExpense = async (req, res) => {
   }
 };
 
-export const updateExpense = async (req, res) => {
+exports.updateExpense = async (req, res) => {
   const { amount, category, date, note } = req.body;
   const userId = req.params.userId;
 
@@ -126,7 +126,7 @@ export const updateExpense = async (req, res) => {
   }
 };
 
-export const deleteExpense = async (req, res) => {
+exports.deleteExpense = async (req, res) => {
   try {
     const userId = req.params.userId;
     const deletedExpense = await Expense.findOneAndDelete({

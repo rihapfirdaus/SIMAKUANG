@@ -1,5 +1,5 @@
-import express from "express";
-import {
+const express = require("express");
+const {
   getIncomes,
   getIncomeById,
   getIncomesByMonth,
@@ -8,7 +8,7 @@ import {
   saveIncome,
   updateIncome,
   deleteIncome,
-} from "../controllers/IncomeController.js";
+} = require("../controllers/IncomeController.js");
 const router = express.Router();
 
 router.get("/user/:userId/income/:id", getIncomeById);
@@ -24,4 +24,4 @@ router.get(
   getIncomesByPeriod
 );
 
-export default router;
+module.exports = router;

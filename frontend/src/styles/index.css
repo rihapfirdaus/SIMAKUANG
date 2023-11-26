@@ -32,6 +32,9 @@ body {
   justify-content: center;
   align-items: center;
 }
+.apps-icon h2{
+  user-select: none;
+}
 .form-container{
     display: flex;
     justify-content: center;
