@@ -20,7 +20,7 @@ db.on("error", (error) => console.log(error));
 db.once("open", () => console.log("database connected..."));
 
 const corsOptions = {
-  origin: ["https://saldosiaga.firebaseapp.com", "http://localhost:5173"],
+  origin: ["https://saldosiaga.firebaseapp.com", "http://localhost:5173/"],
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   credentials: true,
   optionsSuccessStatus: 204,

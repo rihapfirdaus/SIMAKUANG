@@ -14,7 +14,7 @@ export async function action({ request }) {
     try {
       // Menggunakan axios untuk mendapatkan data pengguna
       const userResponse = await axios.get(
-        `http://localhost:5000/user/${updates.email}`
+        `https://saldo-siaga-api.vercel.app//${updates.email}`
       );
       const user = userResponse.data; // Mengambil data dari respons
 
