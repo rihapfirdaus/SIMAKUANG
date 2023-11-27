@@ -2,22 +2,25 @@ const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
-const { userRoute } = require("./routes/UserRoute.js");
-const { incomeRoute } = require("./routes/IncomeRoute.js");
-const { expenseRoute } = require("./routes/ExpenseRoute.js");
-const { savingRoute } = require("./routes/SavingRoute.js");
-const { debtRoute } = require("./routes/DebtRoute.js");
+const userRoute = require("./routes/UserRoute.js");
+const incomeRoute = require("./routes/IncomeRoute.js");
+const expenseRoute = require("./routes/ExpenseRoute.js");
+const savingRoute = require("./routes/SavingRoute.js");
+const debtRoute = require("./routes/DebtRoute.js");
 
 dotenv.config();
 
 const app = express();
 
 const uri = process.env.MONGODB_URI;
-mongoose.connect(uri);
-
-const db = mongoose.connection;
-db.on("error", (error) => console.log(error));
-db.once("open", () => console.log("database connected..."));
+mongoose
+  .connect(uri)
+  .then(() => {
+    console.log("DB Connection Succesfull!");
+  })
+  .catch((e) => {
+    console.log(e.message);
+  });
 
 app.use(
   cors({
