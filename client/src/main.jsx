@@ -14,27 +14,24 @@ import DashboardPage, {
 import { action as actionGoogleAuth } from "./containers/GoogleAuth.js";
 import AuthPage, { action as actionAuth } from "./pages/AuthPage.jsx";
 
-const router = createBrowserRouter(
-  [
-    {
-      path: "/",
-      loader: loaderDashboard,
-      action: actionDashboard,
-      errorElement: <ErrorPage />,
-      element: <DashboardPage />,
-    },
-    {
-      path: "/auth",
-      action: actionAuth,
-      element: <AuthPage />,
-      children: [
-        { path: "/auth/login", element: <LoginComp /> },
-        { path: "/auth/signup", element: <SignupComp /> },
-      ],
-    },
-  ],
-  { basename: "/SaldoSiaga" }
-);
+const router = createBrowserRouter([
+  {
+    path: "/",
+    loader: loaderDashboard,
+    action: actionDashboard,
+    errorElement: <ErrorPage />,
+    element: <DashboardPage />,
+  },
+  {
+    path: "/auth",
+    action: actionAuth,
+    element: <AuthPage />,
+    children: [
+      { path: "/auth/login", element: <LoginComp /> },
+      { path: "/auth/signup", element: <SignupComp /> },
+    ],
+  },
+]);
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
