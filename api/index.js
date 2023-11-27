@@ -24,7 +24,7 @@ mongoose
 
 app.use(
   cors({
-    origin: ["https://saldo-siaga.vercel.app"],
+    origin: ["https://saldo-siaga.vercel.app", "http://localhost:5173"],
     methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE"],
     credentials: true,
     optionsSuccessStatus: 204,
