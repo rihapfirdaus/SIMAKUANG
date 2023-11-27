@@ -1,6 +1,6 @@
 const express = require("express");
-const mongoose = require("mongoose");
 const cors = require("cors");
+const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const { userRoute } = require("./routes/UserRoute.js");
 const { incomeRoute } = require("./routes/IncomeRoute.js");
@@ -19,13 +19,14 @@ const db = mongoose.connection;
 db.on("error", (error) => console.log(error));
 db.once("open", () => console.log("database connected..."));
 
-const corsOptions = {
-  origin: ["https://saldo-siaga.vercel.app"],
-  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-  credentials: true,
-  optionsSuccessStatus: 204,
-};
-app.use(cors(corsOptions));
+app.use(
+  cors({
+    origin: ["https://saldo-siaga.vercel.app"],
+    methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE"],
+    credentials: true,
+    optionsSuccessStatus: 204,
+  })
+);
 
 app.use(express.json());
 
