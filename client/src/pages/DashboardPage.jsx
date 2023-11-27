@@ -23,7 +23,7 @@ const getAuthUser = (auth) => {
 
 export async function loader() {
   const user = await getAuthUser(auth);
-  return user ? { user } : redirect("/signup");
+  return user ? { user } : redirect("/auth");
 }
 
 export async function action() {

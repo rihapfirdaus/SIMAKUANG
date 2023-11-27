@@ -3,7 +3,6 @@ import { Form, redirect, useActionData, useLoaderData } from "react-router-dom";
 import AppsIcon from "../utils/AppsIcon";
 import axios from "axios";
 import { TextField, Stack, Box } from "@mui/material";
-import { fetchSignInMethodsForEmail } from "firebase/auth";
 
 export async function action({ request }) {
   const formData = await request.formData();
@@ -33,7 +32,7 @@ export async function action({ request }) {
   // return error === "" ? redirect("/") : error;
 }
 
-export default function LoginPage() {
+export default function AuthPage() {
   const [email, setEmail] = useState("");
 
   const error = useActionData();
