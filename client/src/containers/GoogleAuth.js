@@ -5,10 +5,13 @@ import { redirect, useNavigate } from "react-router-dom";
 
 export async function action() {
   const googleProvider = new GoogleAuthProvider();
+  var authStatus;
   try {
-    await signInWithRedirect(auth, googleProvider);
+    await signInWithPopup(auth, googleProvider);
+    authStatus = true;
   } catch (error) {
     console.error(error);
+    authStatus = false;
   }
-  return redirect("/");
+  return authStatus ? redirect("/") : { error: "yahh error :(" };
 }
