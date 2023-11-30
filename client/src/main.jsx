@@ -2,17 +2,14 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import "./styles/index.css";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
-import LoginComp from "./components/LoginComp.jsx";
-import SignupComp from "./components/SignupComp.jsx";
-import SignupPage from "./pages/SignupPage.jsx";
+import SignupPage, { action as actionSignup } from "./pages/SignupPage.jsx";
 import ErrorPage from "./pages/ErrorPage.jsx";
-import { Alert } from "@mui/material";
 import DashboardPage, {
   loader as loaderDashboard,
   action as actionDashboard,
 } from "./pages/DashboardPage.jsx";
-import { action as actionGoogleAuth } from "./containers/GoogleAuth.js";
-import AuthPage, { action as actionAuth } from "./pages/AuthPage.jsx";
+import LoginPage, { action as actionLogin } from "./pages/LoginPage.jsx";
+import { action as actionAuthGoogle } from "./containers/GoogleAuth.js";
 
 const router = createBrowserRouter([
   {
@@ -23,13 +20,18 @@ const router = createBrowserRouter([
     element: <DashboardPage />,
   },
   {
-    path: "/auth",
-    action: actionAuth,
-    element: <AuthPage />,
-    children: [
-      { path: "/auth/login", element: <LoginComp /> },
-      { path: "/auth/signup", element: <SignupComp /> },
-    ],
+    path: "/login",
+    action: actionLogin,
+    element: <LoginPage />,
+  },
+  {
+    path: "/signup",
+    action: actionSignup,
+    element: <SignupPage />,
+  },
+  {
+    path: "/google-auth",
+    action: actionAuthGoogle,
   },
 ]);
 

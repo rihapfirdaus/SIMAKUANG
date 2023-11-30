@@ -1,13 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { auth } from "../services/firebase";
 import { onAuthStateChanged, signOut } from "firebase/auth";
-import {
-  Form,
-  redirect,
-  useLoaderData,
-  useNavigate,
-  useRouteLoaderData,
-} from "react-router-dom";
+import { Form, redirect, useLoaderData } from "react-router-dom";
 
 const getAuthUser = (auth) => {
   return new Promise((resolve) => {
@@ -23,7 +17,7 @@ const getAuthUser = (auth) => {
 
 export async function loader() {
   const user = await getAuthUser(auth);
-  return user ? { user } : redirect("/auth");
+  return user ? { user } : redirect("/login");
 }
 
 export async function action() {
