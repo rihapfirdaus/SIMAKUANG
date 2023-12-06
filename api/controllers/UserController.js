@@ -9,6 +9,15 @@ exports.getUsers = async (req, res) => {
   }
 };
 
+exports.getUserByUid = async (req, res) => {
+  try {
+    const user = await User.findOne({ uid: req.params.uid });
+    res.json(user);
+  } catch (error) {
+    res.status(404).json({ message: error.message });
+  }
+};
+
 exports.getUserById = async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
