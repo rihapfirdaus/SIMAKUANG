@@ -78,7 +78,7 @@ export function RepasswordValidation(password, repassword) {
 }
 
 export function LoginFormValidation(email, password) {
-  return EmailValidation(email).valid && PasswordValidation(password).valid
+  return EmailValidation(email).valid && InputValidation(password).valid
     ? true
     : false;
 }
@@ -88,6 +88,6 @@ export function SignupFormValidation(email, name, password, repassword) {
     InputValidation(name).valid &&
     PasswordValidation(password).valid &&
     RepasswordValidation(repassword).valid
-    ? false
-    : true;
+    ? true
+    : false;
 }

@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 html {
   box-sizing: border-box;
 }
@@ -20,70 +24,86 @@ code {
     monospace;
 }
 
-html,
-body {
-  height: 100%;
-  margin: 0;
-  line-height: 1.5;
-  color: #121212;
-}
-.apps-icon{
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-.apps-icon h2{
-  user-select: none;
-}
-.form-container{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 36px;
-    height: 800px;
-    overflow: auto;
-  }
-  
-.form-auth{
-  text-align: center;
-  width: 480px;
-}
-.form-auth h1{
-  align-self: self-start;
-  font-size: x-large;
-}
-
-Button{
-  width: 100%;
-}
-
-@media (max-width: 600px){
-  .form-container{
+/* html, */
+/* body { */
+  /* height: 100%; */
+  /* margin: 0; */
+  /* line-height: 1.5; */
+  /* color: #121212; */
+/* } */
+/* .apps-icon{ */
+  /* display: flex; */
+  /* justify-content: center; */
+  /* align-items: center; */
+/* } */
+/* .apps-icon h2{ */
+  /* user-select: none; */
+/* } */
+/* .form-container{ */
+    /* display: flex; */
+    /* justify-content: center; */
+    /* align-items: center; */
+    /* padding: 36px; */
+    /* height: 800px; */
+    /* overflow: auto; */
+  /* } */
+/*    */
+/* .form-auth{ */
+  /* text-align: center; */
+  /* width: 480px; */
+/* } */
+/* .form-auth h1{ */
+  /* align-self: self-start; */
+  /* font-size: x-large; */
+/* } */
+/*  */
+/* Button{ */
+  /* width: 100%; */
+/* } */
+/*  */
+/* @media (max-width: 600px){ */
+  /* .form-container{ */
     /* width: 500px; */
-    overflow-x: scroll;
-  }
-  .form-auth h1{
-    font-size: x-large;
-  }
-}
-
-@media (min-height: 800px) {
-    .form-container{
-        height: 100vh;
-        overflow: hidden;
-    }
-}
-
-.text-link {
-  color: darkgreen;
-  text-decoration: none;
-}
-.text-link.change-auth{
-  margin-left: 5px;
-}
-.text-link.forgot-pw{
-  text-align: end;
-}
-.text-link:hover{
-  text-decoration: underline;
-}
+    /* overflow-x: scroll; */
+  /* } */
+  /* .form-auth h1{ */
+    /* font-size: x-large; */
+  /* } */
+/* } */
+/*  */
+/* @media (min-height: 800px) { */
+    /* .form-container{ */
+        /* height: 100vh; */
+        /* overflow: hidden; */
+    /* } */
+/* } */
+/*  */
+/* .text-link { */
+  /* color: darkgreen; */
+  /* text-decoration: none; */
+/* } */
+/* .text-link.change-auth{ */
+  /* margin-left: 5px; */
+/* } */
+/* .text-link.forgot-pw{ */
+  /* text-align: end; */
+/* } */
+/* .text-link:hover{ */
+  /* text-decoration: underline; */
+/* } */
+/*  */
+/* .spinner { */
+  /* animation-name: spin; */
+  /* animation-duration: 500ms; */
+  /* animation-iteration-count: infinite; */
+  /* animation-timing-function: linear; */
+/* } */
+/*  */
+/* @keyframes spin { */
+  /* from { */
+    /* transform: rotate(0deg); */
+  /* } */
+  /* to { */
+    /* transform: rotate(360deg); */
+  /* } */
+/* } */

@@ -1,24 +1,70 @@
-import React, { useState, useEffect } from "react";
-import { BrowserRouter as Router } from "react-router-dom";
-import Carousel from "./components/Carousel.jsx";
-import LoginForm from "./components/LoginForm";
-import SignupForm from "./components/SignupComp.jsx";
-import { Routes, Route } from "react-router-dom";
+import React from "react";
+import "./styles/index.css";
+import { RouterProvider, createBrowserRouter } from "react-router-dom";
+import { Signup, action as actionSignup } from "./pages/Signup.jsx";
+import ErrorPage from "./pages/ErrorPage.jsx";
+import Dashboard, { loader as loaderDashboard } from "./pages/Dashboard.jsx";
+import { Login, action as actionLogin } from "./pages/Login.jsx";
+import Root from "./pages/Root.jsx";
+import Home from "./pages/Home.jsx";
+import Notes from "./pages/Notes.jsx";
+import Statistik from "./pages/Statistik.jsx";
+import Profile from "./pages/Profile.jsx";
 
-function App() {
-  return (
-    <Router>
-      <div>
-        <section>
-          <Routes>
-            <Route path="/" element={<Carousel />}></Route>
-            <Route path="/login" element={<LoginForm />} />
-            <Route path="/signup" element={<SignupForm />} />
-          </Routes>
-        </section>
-      </div>
-    </Router>
-  );
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <Root />,
+    errorElement: <ErrorPage />,
+  },
+  {
+    path: "/app/:userId",
+    loader: loaderDashboard,
+    element: <Dashboard />,
+    id: "root",
+    errorElement: <ErrorPage />,
+    children: [
+      {
+        path: "/app/:userId/home",
+        element: <Home />,
+      },
+      {
+        path: "/app/:userId/notes",
+        element: <Notes />,
+      },
+      {
+        path: "/app/:userId/statistic",
+        element: <Statistik />,
+      },
+      {
+        path: "/app/:userId/profile",
+        element: <Profile />,
+      },
+    ],
+  },
+  {
+    path: "/login",
+    action: actionLogin,
+    element: <Login />,
+    errorElement: <ErrorPage />,
+
+    // async lazy() {
+    //   let { actionLogin, LoginPage } = await import("./pages/LoginPage.jsx");
+    //   return {
+    //     action: actionLogin,
+    //     Component: LoginPage,
+    //   };
+    // },
+  },
+  {
+    path: "/signup",
+    action: actionSignup,
+    element: <Signup />,
+    errorElement: <ErrorPage />,
+    // lazy: () => import("./pages/SignupPage.jsx"),
+  },
+]);
+
+export default function App() {
+  return <RouterProvider router={router} />;
 }
-
-export default App;
