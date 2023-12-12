@@ -1,27 +1,24 @@
 const express = require("express");
-const {
-  getIncomes,
-  getIncomeById,
-  getIncomesByMonth,
-  getIncomesByYear,
-  getIncomesByPeriod,
-  saveIncome,
-  updateIncome,
-  deleteIncome,
-} = require("../controllers/IncomeController.js");
 const router = express.Router();
 
-router.get("/user/:userId/income/:id", getIncomeById);
-router.post("/user/:userId/income", saveIncome);
-router.put("/user/:userId/income/:id", updateIncome);
-router.delete("/user/:userId/income/:id", deleteIncome);
+const IncomeController = require("./controllers/IncomeController");
 
-router.get("/user/:userId/incomes", getIncomes);
-router.get("/user/:userId/incomes/month/:year/:month", getIncomesByMonth);
-router.get("/user/:userId/incomes/year/:year", getIncomesByYear);
+router.post("/incomes", IncomeController.createIncome); // Create income
+router.get("/incomes/:userId", IncomeController.getIncomesByUser); // Get income by user
+router.get("/incomes/:id", IncomeController.getIncomeById); // Get income by ID
+router.put("/incomes/:id", IncomeController.updateIncome); // Update income
+router.delete("/incomes/:id", IncomeController.deleteIncome); // Delete income
 router.get(
-  "/user/:userId/incomes/period/:startDate/:endDate",
-  getIncomesByPeriod
-);
+  "/incomes/total/month/:year",
+  IncomeController.getTotalIncomeByMonth
+); // Get total income per month (by year)
+router.get("/incomes/total/year/:year", IncomeController.getTotalIncomeByYear); // Get total income per year
+router.get(
+  "/incomes/total/period/:period",
+  IncomeController.getTotalIncomeByPeriod
+); // Get total income per period (custom or predefined)
+router.get("/incomes/monthly/:year/:month", IncomeController.getMonthlyIncome); // Get monthly income (detailed data)
+router.get("/incomes/weekly/:year/:week", IncomeController.getWeeklyIncome); // Get weekly income (detailed data)
+router.get("/incomes/yearly/:year", IncomeController.getYearlyIncome); // Get yearly income (detailed data)
 
 module.exports = router;
