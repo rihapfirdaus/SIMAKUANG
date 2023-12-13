@@ -161,7 +161,7 @@ const getTotalIncomeByUser = async (req, res) => {
 // Get total income monthly by year (array)
 const getMonthlyIncomesByYear = async (req, res) => {
   const userId = req.params.userId;
-  const { year } = req.query;
+  const year = req.query.year || new Date().getFullYear();
 
   try {
     const match = {

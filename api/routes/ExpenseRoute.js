@@ -1,27 +1,24 @@
 const express = require("express");
-const {
-  getExpenses,
-  getExpenseById,
-  getExpensesByMonth,
-  getExpensesByYear,
-  getExpensesByPeriod,
-  saveExpense,
-  updateExpense,
-  deleteExpense,
-} = require("../controllers/ExpenseController.js");
 const router = express.Router();
 
-router.get("/user/:userId/expense/:id", getExpenseById);
-router.post("/user/:userId/expense", saveExpense);
-router.put("/user/:userId/expense/:id", updateExpense);
-router.delete("/user/:userId/expense/:id", deleteExpense);
+const expenseController = require("../controllers/ExpenseController"); // Adjust path as needed
 
-router.get("/user/:userId/expenses", getExpenses);
-router.get("/user/:userId/expenses/month/:year/:month", getExpensesByMonth);
-router.get("/user/:userId/expenses/year/:year", getExpensesByYear);
+router.post("/expense/", expenseController.createExpense);
+router.put("/user/:userId/expense/:id", expenseController.updateExpense);
+router.delete("/user/:userId/expense/:id", expenseController.deleteExpense);
+
+router.get("/user/:userId/expense", expenseController.getExpensesByUser);
+router.get("/user/:userId/expense/id/:id", expenseController.getExpenseById);
 router.get(
-  "/user/:userId/expenses/period/:startDate/:endDate",
-  getExpensesByPeriod
+  "/user/:userId/expense/total",
+  expenseController.getTotalExpenseByUser
 );
-
+router.get(
+  "/user/:userId/expense/total/month",
+  expenseController.getMonthlyExpensesByYear
+);
+router.get(
+  "/user/:userId/expense/total/all/months",
+  expenseController.getMonthlyExpensesByYear
+);
 module.exports = router;

@@ -6,11 +6,14 @@ const Debt = mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "Users",
     required: true,
-    ref: Users,
   },
-  lender: {
+  debtor: {
     type: String,
-    required: true,
+    lowercase: true,
+  },
+  creditor: {
+    type: String,
+    lowercase: true,
   },
   amount: {
     type: Number,

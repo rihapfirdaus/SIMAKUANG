@@ -1,145 +1,223 @@
 const Expense = require("../models/ExpenseModel.js");
 
-exports.getExpenses = async (req, res) => {
+// Create a new expense
+const createExpense = async (req, res) => {
+  const { userId, amount, category, date, note } = req.body;
+
   try {
-    const userId = req.params.userId;
-    const expenses = await Expense.find({ userId });
-    res.status(200).json(expenses);
+    const expense = new Expense({ userId, amount, category, date, note });
+    await expense.save();
+
+    return res
+      .status(201)
+      .json({ message: "Expense created successfully", expense });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error(error);
+    return res.status(500).json({ message: "Error creating expense." });
   }
 };
 
-exports.getExpenseById = async (req, res) => {
+// Get all expenses for a user (optional filtering)
+const getExpensesByUser = async (req, res) => {
+  const userId = req.params.userId;
+  const { year, month, startDate, endDate } = req.query;
+
   try {
-    const userId = req.params.userId;
-    const expense = await Expense.findOne({
-      _id: req.params.id,
-      userId,
-    });
-    if (expense) {
-      res.json(expense);
-    } else {
-      res.status(404).json({ message: "Expense not found" });
+    let match = { userId }; // Default match only filters by user
+
+    if (year && month) {
+      match.date = {
+        $gte: new Date(year, month - 1, 1), // Adjust month index (0-based)
+        $lt: new Date(year, month, 1),
+      };
+    } else if (year) {
+      match.date = {
+        $gte: new Date(year, 0, 1),
+        $lt: new Date(year + 1, 0, 1),
+      };
+    } else if (month) {
+      match.date = {
+        $gte: new Date(new Date().getFullYear(), month - 1, 1), // Adjust month index (0-based)
+        $lt: new Date(new Date().getFullYear(), month, 1),
+      };
+    } else if (startDate && endDate) {
+      match.date = { $gte: new Date(startDate), $lt: new Date(endDate) };
     }
+
+    const expenses = await Expense.find(match);
+
+    if (!expenses) {
+      return res.status(404).json({ message: "No expenses found for user." });
+    }
+
+    return res.status(200).json({ expenses });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error(error);
+    return res.status(500).json({ message: "Error fetching expenses." });
   }
 };
 
-exports.getExpensesByMonth = async (req, res) => {
-  const { userId, year, month } = req.params;
-
-  try {
-    const parsedMonth = parseInt(month);
-    const nextMonth = parsedMonth < 12 ? parsedMonth + 1 : 1;
-    const nextYear = parsedMonth < 12 ? year : parseInt(year) + 1;
-
-    const expense = await Expense.find({
-      userId,
-      date: {
-        $gte: new Date(`${year}-${month}-01`),
-        $lt: new Date(`${nextYear}-${nextMonth}-01`),
-      },
-    });
-
-    res.json(expense);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
-exports.getExpensesByYear = async (req, res) => {
-  const { userId, year } = req.params;
-
-  try {
-    const expense = await Expense.find({
-      userId,
-      date: {
-        $gte: new Date(`${year}-01-01`),
-        $lt: new Date(`${parseInt(year) + 1}-01-01`),
-      },
-    });
-
-    res.json(expense);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
-exports.getExpensesByPeriod = async (req, res) => {
-  const { userId, startDate, endDate } = req.params;
-
-  try {
-    const expense = await Expense.find({
-      userId,
-      date: {
-        $gte: new Date(startDate),
-        $lt: new Date(`${parseInt(endDate) + 1}`),
-      },
-    });
-
-    res.json(expense);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
-exports.saveExpense = async (req, res) => {
+// Update an expense
+const updateExpense = async (req, res) => {
+  const expenseId = req.params.id;
+  const userId = req.user.id;
   const { amount, category, date, note } = req.body;
-  const userId = req.params.userId;
 
   try {
-    const newExpense = new Expense({
-      userId,
-      amount,
-      category,
-      date,
-      note,
-    });
-
-    const savedExpense = await newExpense.save();
-    res.status(201).json(savedExpense);
-  } catch (error) {
-    res.status(400).json({ message: error.message });
-  }
-};
-
-exports.updateExpense = async (req, res) => {
-  const { amount, category, date, note } = req.body;
-  const userId = req.params.userId;
-
-  try {
-    const updatedExpense = await Expense.findOneAndUpdate(
-      { _id: req.params.id, userId },
+    const expense = await Expense.findByIdAndUpdate(
+      expenseId,
       { amount, category, date, note },
-      { new: true }
+      { userId }
     );
 
-    if (updatedExpense) {
-      res.json(updatedExpense);
-    } else {
-      res.status(404).json({ message: "Expense not found" });
+    if (!expense) {
+      return res.status(404).json({ message: "Expense not found." });
     }
+
+    return res
+      .status(200)
+      .json({ message: "Expense updated successfully", expense });
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    console.error(error);
+    return res.status(500).json({ message: "Error updating expense." });
   }
 };
 
-exports.deleteExpense = async (req, res) => {
+// Delete an expense
+const deleteExpense = async (req, res) => {
+  const expenseId = req.params.id;
+  const userId = req.user.id;
+
   try {
-    const userId = req.params.userId;
-    const deletedExpense = await Expense.findOneAndDelete({
-      _id: req.params.id,
+    const expense = await Expense.findByIdAndDelete(expenseId, { userId });
+
+    if (!expense) {
+      return res.status(404).json({ message: "Expense not found." });
+    }
+
+    return res.status(200).json({ message: "Expense deleted successfully" });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Error deleting expense." });
+  }
+};
+
+// Get a specific expense by id
+const getExpenseById = async (req, res) => {
+  const expenseId = req.params.id;
+
+  try {
+    const expense = await Expense.findById(expenseId);
+
+    if (!expense) {
+      return res.status(404).json({ message: "Expense not found." });
+    }
+
+    return res.status(200).json({ expense });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Error fetching expense." });
+  }
+};
+
+// Get total expense
+const getTotalExpenseByUser = async (req, res) => {
+  const userId = req.params.userId;
+  const { year, month, startDate, endDate } = req.query;
+
+  try {
+    let match = { userId }; // Default match only filters by user
+
+    if (year && month) {
+      match.date = {
+        $gte: new Date(year, month - 1, 1), // Adjust month index (0-based)
+        $lt: new Date(year, month, 1),
+      };
+    } else if (year) {
+      match.date = {
+        $gte: new Date(year, 0, 1),
+        $lt: new Date(year + 1, 0, 1),
+      };
+    } else if (month) {
+      match.date = {
+        $gte: new Date(new Date().getFullYear(), month - 1, 1), // Adjust month index (0-based)
+        $lt: new Date(new Date().getFullYear(), month, 1),
+      };
+    } else if (startDate && endDate) {
+      match.date = { $gte: new Date(startDate), $lt: new Date(endDate) };
+    }
+
+    const expenses = await Expense.find(match);
+
+    const totalExpense = expenses.reduce(
+      (sum, expense) => sum + expense.amount,
+      0
+    );
+
+    return res.status(200).json({ expense: totalExpense });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Error fetching total expense." });
+  }
+};
+
+// Get total expense monthly by year (array)
+const getMonthlyExpensesByYear = async (req, res) => {
+  const userId = req.params.userId;
+  const year = req.query.year || new Date().getFullYear();
+
+  try {
+    const match = {
       userId,
+      date: {
+        $gte: new Date(year, 0, 1),
+        $lt: new Date(Number(year) + 1, 0, 1),
+      },
+    };
+
+    const expenses = await Expense.find(match);
+
+    if (!expenses || expenses.length === 0) {
+      return res.status(404).json({ message: "No expenses found for user." });
+    }
+
+    // Group expenses by month
+    const groupedExpenses = {};
+    expenses.forEach((expense) => {
+      const month = expense.date.getMonth() + 1; // Months are 0-based in JavaScript Date
+      if (!groupedExpenses[month]) {
+        groupedExpenses[month] = { total: 0, expenses: [] };
+      }
+      groupedExpenses[month].total += expense.amount;
+      groupedExpenses[month].expenses.push({
+        amount: expense.amount,
+        date: expense.date,
+        category: expense.category,
+      });
     });
 
-    if (deletedExpense) {
-      res.json(deletedExpense);
-    } else {
-      res.status(404).json({ message: "Expense not found" });
-    }
+    // Convert the groupedExpenses object to an array
+    const monthlyExpenses = Object.keys(groupedExpenses).map((month) => ({
+      month: Number(month),
+      total: groupedExpenses[month].total,
+      expenses: groupedExpenses[month].expenses,
+    }));
+
+    return res.status(200).json({ monthlyExpenses });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error(error);
+    return res
+      .status(500)
+      .json({ message: "Error fetching monthly expenses." });
   }
+};
+
+module.exports = {
+  createExpense,
+  updateExpense,
+  deleteExpense,
+  getExpenseById,
+  getExpensesByUser,
+  getTotalExpenseByUser,
+  getMonthlyExpensesByYear,
 };

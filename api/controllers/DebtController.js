@@ -1,88 +1,225 @@
 const Debt = require("../models/DebtModel.js");
 
-exports.getDebts = async (req, res) => {
-  try {
-    const userId = req.params.userId;
-    const debts = await Debt.find({ userId });
-    res.status(200).json(debts);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
+// Create a new debt
+const createDebt = async (req, res) => {
+  const { userId, debtor, creditor, amount, category, dueDate, status, note } =
+    req.body;
 
-exports.getDebtById = async (req, res) => {
   try {
-    const userId = req.params.userId;
-    const debt = await Debt.findOne({
-      _id: req.params.id,
+    const debt = new Debt({
       userId,
-    });
-    if (debt) {
-      res.status(200).json(debt);
-    } else {
-      res.status(404).json({ message: "Debt not found" });
-    }
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
-exports.saveDebt = async (req, res) => {
-  const { lender, amount, dueDate, status, note } = req.body;
-  const userId = req.params.userId;
-
-  try {
-    const newDebt = new Debt({
-      userId,
-      lender,
+      debtor,
+      creditor,
       amount,
+      category,
       dueDate,
       status,
       note,
     });
+    await debt.save();
 
-    const savedDebt = await newDebt.save();
-    res.status(201).json(savedDebt);
+    return res.status(201).json({ message: "Debt created successfully", debt });
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    console.error(error);
+    return res.status(500).json({ message: "Error creating debt." });
   }
 };
 
-exports.updateDebt = async (req, res) => {
-  const { lender, amount, dueDate, status, note } = req.body;
+// Get all debts for a user (optional filtering)
+const getDebtsByUser = async (req, res) => {
   const userId = req.params.userId;
+  const { year, month, startDate, endDate } = req.query;
 
   try {
-    const updatedDebt = await Debt.findOneAndUpdate(
-      { _id: req.params.id, userId },
-      { lender, amount, dueDate, status, note },
-      { new: true }
+    let match = { userId }; // Default match only filters by user
+
+    if (year && month) {
+      match.date = {
+        $gte: new Date(year, month - 1, 1), // Adjust month index (0-based)
+        $lt: new Date(year, month, 1),
+      };
+    } else if (year) {
+      match.date = {
+        $gte: new Date(year, 0, 1),
+        $lt: new Date(year + 1, 0, 1),
+      };
+    } else if (month) {
+      match.date = {
+        $gte: new Date(new Date().getFullYear(), month - 1, 1), // Adjust month index (0-based)
+        $lt: new Date(new Date().getFullYear(), month, 1),
+      };
+    } else if (startDate && endDate) {
+      match.date = { $gte: new Date(startDate), $lt: new Date(endDate) };
+    }
+
+    const debts = await Debt.find(match);
+
+    if (!debts) {
+      return res.status(404).json({ message: "No debts found for user." });
+    }
+
+    return res.status(200).json({ debts });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Error fetching debts." });
+  }
+};
+
+// Update an debt
+const updateDebt = async (req, res) => {
+  const debtId = req.params.id;
+  const userId = req.user.id;
+  const { debtor, creditor, amount, category, dueDate, status, note } =
+    req.body;
+
+  try {
+    const debt = await Debt.findByIdAndUpdate(
+      debtId,
+      { debtor, creditor, amount, category, dueDate, status, note },
+      { userId }
     );
 
-    if (updatedDebt) {
-      res.json(updatedDebt);
-    } else {
-      res.status(404).json({ message: "Debt not found" });
+    if (!debt) {
+      return res.status(404).json({ message: "Debt not found." });
     }
+
+    return res.status(200).json({ message: "Debt updated successfully", debt });
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    console.error(error);
+    return res.status(500).json({ message: "Error updating debt." });
   }
 };
 
-exports.deleteDebt = async (req, res) => {
+// Delete an debt
+const deleteDebt = async (req, res) => {
+  const debtId = req.params.id;
+  const userId = req.user.id;
+
   try {
-    const userId = req.params.userId;
-    const deletedDebt = await Debt.findOneAndDelete({
-      _id: req.params.id,
+    const debt = await Debt.findByIdAndDelete(debtId, { userId });
+
+    if (!debt) {
+      return res.status(404).json({ message: "Debt not found." });
+    }
+
+    return res.status(200).json({ message: "Debt deleted successfully" });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Error deleting debt." });
+  }
+};
+
+// Get a specific debt by id
+const getDebtById = async (req, res) => {
+  const debtId = req.params.id;
+
+  try {
+    const debt = await Debt.findById(debtId);
+
+    if (!debt) {
+      return res.status(404).json({ message: "Debt not found." });
+    }
+
+    return res.status(200).json({ debt });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Error fetching debt." });
+  }
+};
+
+// Get total debt
+const getTotalDebtByUser = async (req, res) => {
+  const userId = req.params.userId;
+  const { year, month, startDate, endDate } = req.query;
+
+  try {
+    let match = { userId }; // Default match only filters by user
+
+    if (year && month) {
+      match.date = {
+        $gte: new Date(year, month - 1, 1), // Adjust month index (0-based)
+        $lt: new Date(year, month, 1),
+      };
+    } else if (year) {
+      match.date = {
+        $gte: new Date(year, 0, 1),
+        $lt: new Date(year + 1, 0, 1),
+      };
+    } else if (month) {
+      match.date = {
+        $gte: new Date(new Date().getFullYear(), month - 1, 1), // Adjust month index (0-based)
+        $lt: new Date(new Date().getFullYear(), month, 1),
+      };
+    } else if (startDate && endDate) {
+      match.date = { $gte: new Date(startDate), $lt: new Date(endDate) };
+    }
+
+    const debts = await Debt.find(match);
+
+    const totalDebt = debts.reduce((sum, debt) => sum + debt.amount, 0);
+
+    return res.status(200).json({ debt: totalDebt });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Error fetching total debt." });
+  }
+};
+
+// Get total debt monthly by year (array)
+const getMonthlyDebtsByYear = async (req, res) => {
+  const userId = req.params.userId;
+  const year = req.query.year || new Date().getFullYear();
+
+  try {
+    const match = {
       userId,
+      date: {
+        $gte: new Date(year, 0, 1),
+        $lt: new Date(Number(year) + 1, 0, 1),
+      },
+    };
+
+    const debts = await Debt.find(match);
+
+    if (!debts || debts.length === 0) {
+      return res.status(404).json({ message: "No debts found for user." });
+    }
+
+    // Group debts by month
+    const groupedDebts = {};
+    debts.forEach((debt) => {
+      const month = debt.date.getMonth() + 1; // Months are 0-based in JavaScript Date
+      if (!groupedDebts[month]) {
+        groupedDebts[month] = { total: 0, debts: [] };
+      }
+      groupedDebts[month].total += debt.amount;
+      groupedDebts[month].debts.push({
+        amount: debt.amount,
+        date: debt.date,
+        category: debt.category,
+      });
     });
 
-    if (deletedDebt) {
-      res.json(deletedDebt);
-    } else {
-      res.status(404).json({ message: "Debt not found" });
-    }
+    // Convert the groupedDebts object to an array
+    const monthlyDebts = Object.keys(groupedDebts).map((month) => ({
+      month: Number(month),
+      total: groupedDebts[month].total,
+      debts: groupedDebts[month].debts,
+    }));
+
+    return res.status(200).json({ monthlyDebts });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error(error);
+    return res.status(500).json({ message: "Error fetching monthly debts." });
   }
+};
+
+module.exports = {
+  createDebt,
+  updateDebt,
+  deleteDebt,
+  getDebtById,
+  getDebtsByUser,
+  getTotalDebtByUser,
+  getMonthlyDebtsByYear,
 };
