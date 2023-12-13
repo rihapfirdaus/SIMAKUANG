@@ -1,4 +1,4 @@
-const Income = require("../models/Income"); // Adjust path as needed
+const Income = require("../models/IncomeModel.js");
 
 // Create a new income
 const createIncome = async (req, res) => {
@@ -17,22 +17,27 @@ const createIncome = async (req, res) => {
   }
 };
 
-// Get all incomes for a user
+// Get all incomes for a user (optional filtering)
 const getIncomesByUser = async (req, res) => {
   const userId = req.params.userId;
   const { year, month, startDate, endDate } = req.query;
 
   try {
-    let match = { userId };
+    let match = { userId }; // Default match only filters by user
 
-    if (year) {
+    if (year && month) {
+      match.date = {
+        $gte: new Date(year, month - 1, 1), // Adjust month index (0-based)
+        $lt: new Date(year, month, 1),
+      };
+    } else if (year) {
       match.date = {
         $gte: new Date(year, 0, 1),
         $lt: new Date(year + 1, 0, 1),
       };
     } else if (month) {
       match.date = {
-        $gte: new Date(new Date().getFullYear(), month - 1, 1), // adjust month index (0-based)
+        $gte: new Date(new Date().getFullYear(), month - 1, 1), // Adjust month index (0-based)
         $lt: new Date(new Date().getFullYear(), month, 1),
       };
     } else if (startDate && endDate) {
@@ -55,15 +60,15 @@ const getIncomesByUser = async (req, res) => {
 // Update an income
 const updateIncome = async (req, res) => {
   const incomeId = req.params.id;
+  const userId = req.user.id;
   const { amount, category, date, note } = req.body;
 
   try {
-    const income = await Income.findByIdAndUpdate(incomeId, {
-      amount,
-      category,
-      date,
-      note,
-    });
+    const income = await Income.findByIdAndUpdate(
+      incomeId,
+      { amount, category, date, note },
+      { userId }
+    );
 
     if (!income) {
       return res.status(404).json({ message: "Income not found." });
@@ -81,9 +86,14 @@ const updateIncome = async (req, res) => {
 // Delete an income
 const deleteIncome = async (req, res) => {
   const incomeId = req.params.id;
+  const userId = req.user.id;
 
   try {
-    await Income.findByIdAndDelete(incomeId);
+    const income = await Income.findByIdAndDelete(incomeId, { userId });
+
+    if (!income) {
+      return res.status(404).json({ message: "Income not found." });
+    }
 
     return res.status(200).json({ message: "Income deleted successfully" });
   } catch (error) {
@@ -110,157 +120,99 @@ const getIncomeById = async (req, res) => {
   }
 };
 
-// Get total income for a user by month (aggregations)
-const getTotalIncomeByMonth = async (req, res) => {
+// Get total income
+const getTotalIncomeByUser = async (req, res) => {
   const userId = req.params.userId;
-  const year = req.query.year || new Date().getFullYear();
-  const month = req.query.month || new Date().getMonth();
+  const { year, month, startDate, endDate } = req.query;
+
+  try {
+    let match = { userId }; // Default match only filters by user
+
+    if (year && month) {
+      match.date = {
+        $gte: new Date(year, month - 1, 1), // Adjust month index (0-based)
+        $lt: new Date(year, month, 1),
+      };
+    } else if (year) {
+      match.date = {
+        $gte: new Date(year, 0, 1),
+        $lt: new Date(year + 1, 0, 1),
+      };
+    } else if (month) {
+      match.date = {
+        $gte: new Date(new Date().getFullYear(), month - 1, 1), // Adjust month index (0-based)
+        $lt: new Date(new Date().getFullYear(), month, 1),
+      };
+    } else if (startDate && endDate) {
+      match.date = { $gte: new Date(startDate), $lt: new Date(endDate) };
+    }
+
+    const incomes = await Income.find(match);
+
+    const totalIncome = incomes.reduce((sum, income) => sum + income.amount, 0);
+
+    return res.status(200).json({ income: totalIncome });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Error fetching total income." });
+  }
+};
+
+// Get total income monthly by year (array)
+const getMonthlyIncomesByYear = async (req, res) => {
+  const userId = req.params.userId;
+  const { year } = req.query;
 
   try {
     const match = {
       userId,
       date: {
-        $gte: new Date(year, month, 1),
-        $lt: new Date(year, month + 1, 1),
+        $gte: new Date(year, 0, 1),
+        $lt: new Date(Number(year) + 1, 0, 1),
       },
     };
-    const totalIncome = await Income.aggregate([
-      { $match: match },
-      { $group: { _id: null, total: { $sum: "$amount" } } },
-    ]);
 
-    const income = totalIncome[0] ? totalIncome[0].total : 0;
+    const incomes = await Income.find(match);
 
-    return res.status(200).json({ income });
+    if (!incomes || incomes.length === 0) {
+      return res.status(404).json({ message: "No incomes found for user." });
+    }
+
+    // Group incomes by month
+    const groupedIncomes = {};
+    incomes.forEach((income) => {
+      const month = income.date.getMonth() + 1; // Months are 0-based in JavaScript Date
+      if (!groupedIncomes[month]) {
+        groupedIncomes[month] = { total: 0, incomes: [] };
+      }
+      groupedIncomes[month].total += income.amount;
+      groupedIncomes[month].incomes.push({
+        amount: income.amount,
+        date: income.date,
+        category: income.category,
+      });
+    });
+
+    // Convert the groupedIncomes object to an array
+    const monthlyIncomes = Object.keys(groupedIncomes).map((month) => ({
+      month: Number(month),
+      total: groupedIncomes[month].total,
+      incomes: groupedIncomes[month].incomes,
+    }));
+
+    return res.status(200).json({ monthlyIncomes });
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ message: "Error fetching income by month." });
+    return res.status(500).json({ message: "Error fetching monthly incomes." });
   }
 };
-
-// Get total income for a user by year (aggregations)
-const getTotalIncomeByYear = async (req, res) => {
-  const userId = req.params.userId;
-  const year = req.query.year || new Date().getFullYear();
-
-  try {
-    const match = {
-      userId,
-      date: { $gte: new Date(year, 0, 1), $lt: new Date(year + 1, 0, 1) },
-    };
-    const totalIncome = await Income.aggregate([
-      { $match: match },
-      { $group: { _id: null, total: { $sum: "$amount" } } },
-    ]);
-
-    const income = totalIncome[0] ? totalIncome[0].total : 0;
-
-    return res.status(200).json({ income });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: "Error fetching income by year." });
-  }
-};
-
-// Get total income for a user by period (aggregations)
-const getTotalIncomeByPeriod = async (req, res) => {
-  const userId = req.params.userId;
-  const startDate = req.query.startDate; // YYYY-MM-DD format
-  const endDate = req.query.endDate; // YYYY-MM-DD format
-
-  if (!startDate || !endDate) {
-    return res
-      .status(400)
-      .json({ message: "Missing start and end date for period." });
-  }
-
-  try {
-    const match = {
-      userId,
-      date: { $gte: new Date(startDate), $lt: new Date(endDate) },
-    };
-    const totalIncome = await Income.aggregate([
-      { $match: match },
-      { $group: { _id: null, total: { $sum: "$amount" } } },
-    ]);
-
-    const income = totalIncome[0] ? totalIncome[0].total : 0;
-
-    return res.status(200).json({ income });
-  } catch (error) {
-    console.error(error);
-    return res
-      .status(500)
-      .json({ message: "Error fetching income by period." });
-  }
-};
-
-// Get array total by month
-async function getMonthlyIncome(req, res) {
-  const startDate = new Date(req.query.year, req.query.month, 1);
-  const endDate = new Date(req.query.year, req.query.month + 1, 0);
-
-  const incomes = await getAllIncomes(req, {
-    period: "monthly",
-    startDate,
-    endDate,
-  });
-
-  const monthlyIncomes = incomes.reduce((acc, income) => {
-    acc[income.date.getMonth()] += income.amount;
-    return acc;
-  }, {});
-
-  return res.status(200).json({ monthlyIncomes });
-}
-
-// Get array total by week
-async function getWeeklyIncome(req, res) {
-  const startDate = new Date(req.query.year, req.query.month, req.query.day);
-  const endDate = new Date(
-    startDate.getFullYear(),
-    startDate.getMonth(),
-    startDate.getDate() + 6
-  );
-
-  const incomes = await getAllIncomes(req, {
-    period: "custom",
-    startDate,
-    endDate,
-  });
-
-  const weeklyIncomes = incomes.reduce((acc, income) => {
-    acc[income.date.getWeek()] += income.amount;
-    return acc;
-  }, {});
-
-  return res.status(200).json({ weeklyIncomes });
-}
-
-// Get array total by year
-async function getYearlyIncome(req, res) {
-  const year = req.query.year;
-
-  const incomes = await getAllIncomes(req, { period: "yearly", year });
-
-  const yearlyIncomes = incomes.reduce((acc, income) => {
-    acc[income.date.getFullYear()] += income.amount;
-    return acc;
-  }, {});
-
-  return res.status(200).json({ yearlyIncomes });
-}
 
 module.exports = {
   createIncome,
-  getIncomesByUser,
   updateIncome,
   deleteIncome,
   getIncomeById,
-  getTotalIncomeByMonth,
-  getTotalIncomeByYear,
-  getTotalIncomeByPeriod,
-  getMonthlyIncome,
-  getWeeklyIncome,
-  getYearlyIncome,
+  getIncomesByUser,
+  getTotalIncomeByUser,
+  getMonthlyIncomesByYear,
 };

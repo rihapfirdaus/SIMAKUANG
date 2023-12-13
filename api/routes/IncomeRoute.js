@@ -1,24 +1,21 @@
 const express = require("express");
 const router = express.Router();
 
-const IncomeController = require("./controllers/IncomeController");
+const incomeController = require("../controllers/IncomeController"); // Adjust path as needed
 
-router.post("/incomes", IncomeController.createIncome); // Create income
-router.get("/incomes/:userId", IncomeController.getIncomesByUser); // Get income by user
-router.get("/incomes/:id", IncomeController.getIncomeById); // Get income by ID
-router.put("/incomes/:id", IncomeController.updateIncome); // Update income
-router.delete("/incomes/:id", IncomeController.deleteIncome); // Delete income
-router.get(
-  "/incomes/total/month/:year",
-  IncomeController.getTotalIncomeByMonth
-); // Get total income per month (by year)
-router.get("/incomes/total/year/:year", IncomeController.getTotalIncomeByYear); // Get total income per year
-router.get(
-  "/incomes/total/period/:period",
-  IncomeController.getTotalIncomeByPeriod
-); // Get total income per period (custom or predefined)
-router.get("/incomes/monthly/:year/:month", IncomeController.getMonthlyIncome); // Get monthly income (detailed data)
-router.get("/incomes/weekly/:year/:week", IncomeController.getWeeklyIncome); // Get weekly income (detailed data)
-router.get("/incomes/yearly/:year", IncomeController.getYearlyIncome); // Get yearly income (detailed data)
+router.post("/income/", incomeController.createIncome);
+router.put("/user/:userId/income/:id", incomeController.updateIncome);
+router.delete("/user/:userId/income/:id", incomeController.deleteIncome);
 
+router.get("/user/:userId/income", incomeController.getIncomesByUser);
+router.get("/user/:userId/income/id/:id", incomeController.getIncomeById);
+router.get("/user/:userId/income/total", incomeController.getTotalIncomeByUser);
+router.get(
+  "/user/:userId/income/total/month",
+  incomeController.getMonthlyIncomesByYear
+);
+router.get(
+  "/user/:userId/income/total/all/months",
+  incomeController.getMonthlyIncomesByYear
+);
 module.exports = router;
