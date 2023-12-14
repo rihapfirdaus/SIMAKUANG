@@ -202,12 +202,18 @@ const getMonthlySavingsByYear = async (req, res) => {
       });
     });
 
-    // Convert the groupedSavings object to an array
-    const monthlySavings = Object.keys(groupedSavings).map((month) => ({
-      month: Number(month),
-      total: groupedSavings[month].total,
-      savings: groupedSavings[month].savings,
-    }));
+    // Convert the groupedSavings object to an array, filling in missing months
+    const monthlySavings = [];
+    for (let month = 1; month <= 12; month++) {
+      if (!groupedSavings[month]) {
+        groupedSavings[month] = { total: 0, savings: [] };
+      }
+      monthlySavings.push({
+        month: Number(month),
+        total: groupedSavings[month].total,
+        savings: groupedSavings[month].savings,
+      });
+    }
 
     return res.status(200).json({ monthlySavings });
   } catch (error) {

@@ -197,12 +197,18 @@ const getMonthlyExpensesByYear = async (req, res) => {
       });
     });
 
-    // Convert the groupedExpenses object to an array
-    const monthlyExpenses = Object.keys(groupedExpenses).map((month) => ({
-      month: Number(month),
-      total: groupedExpenses[month].total,
-      expenses: groupedExpenses[month].expenses,
-    }));
+    // Convert the groupedExpenses object to an array, filling in missing months
+    const monthlyExpenses = [];
+    for (let month = 1; month <= 12; month++) {
+      if (!groupedExpenses[month]) {
+        groupedExpenses[month] = { total: 0, expenses: [] };
+      }
+      monthlyExpenses.push({
+        month: Number(month),
+        total: groupedExpenses[month].total,
+        expenses: groupedExpenses[month].expenses,
+      });
+    }
 
     return res.status(200).json({ monthlyExpenses });
   } catch (error) {

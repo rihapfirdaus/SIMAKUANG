@@ -11,10 +11,6 @@ router.get("/user/:userId/income", incomeController.getIncomesByUser);
 router.get("/user/:userId/income/id/:id", incomeController.getIncomeById);
 router.get("/user/:userId/income/total", incomeController.getTotalIncomeByUser);
 router.get(
-  "/user/:userId/income/total/month",
-  incomeController.getMonthlyIncomesByYear
-);
-router.get(
   "/user/:userId/income/total/all/months",
   incomeController.getMonthlyIncomesByYear
 );

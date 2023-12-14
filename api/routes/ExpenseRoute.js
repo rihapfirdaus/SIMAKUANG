@@ -14,10 +14,6 @@ router.get(
   expenseController.getTotalExpenseByUser
 );
 router.get(
-  "/user/:userId/expense/total/month",
-  expenseController.getMonthlyExpensesByYear
-);
-router.get(
   "/user/:userId/expense/total/all/months",
   expenseController.getMonthlyExpensesByYear
 );

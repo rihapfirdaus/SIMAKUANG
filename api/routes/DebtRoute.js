@@ -11,10 +11,6 @@ router.get("/user/:userId/debt", debtController.getDebtsByUser);
 router.get("/user/:userId/debt/id/:id", debtController.getDebtById);
 router.get("/user/:userId/debt/total", debtController.getTotalDebtByUser);
 router.get(
-  "/user/:userId/debt/total/month",
-  debtController.getMonthlyDebtsByYear
-);
-router.get(
   "/user/:userId/debt/total/all/months",
   debtController.getMonthlyDebtsByYear
 );

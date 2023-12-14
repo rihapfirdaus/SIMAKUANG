@@ -166,7 +166,6 @@ const getTotalDebtByUser = async (req, res) => {
   }
 };
 
-// Get total debt monthly by year (array)
 const getMonthlyDebtsByYear = async (req, res) => {
   const userId = req.params.userId;
   const year = req.query.year || new Date().getFullYear();
@@ -201,12 +200,18 @@ const getMonthlyDebtsByYear = async (req, res) => {
       });
     });
 
-    // Convert the groupedDebts object to an array
-    const monthlyDebts = Object.keys(groupedDebts).map((month) => ({
-      month: Number(month),
-      total: groupedDebts[month].total,
-      debts: groupedDebts[month].debts,
-    }));
+    // Convert the groupedDebts object to an array, filling in missing months
+    const monthlyDebts = [];
+    for (let month = 1; month <= 12; month++) {
+      if (!groupedDebts[month]) {
+        groupedDebts[month] = { total: 0, debts: [] };
+      }
+      monthlyDebts.push({
+        month: Number(month),
+        total: groupedDebts[month].total,
+        debts: groupedDebts[month].debts,
+      });
+    }
 
     return res.status(200).json({ monthlyDebts });
   } catch (error) {

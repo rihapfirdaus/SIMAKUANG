@@ -194,12 +194,18 @@ const getMonthlyIncomesByYear = async (req, res) => {
       });
     });
 
-    // Convert the groupedIncomes object to an array
-    const monthlyIncomes = Object.keys(groupedIncomes).map((month) => ({
-      month: Number(month),
-      total: groupedIncomes[month].total,
-      incomes: groupedIncomes[month].incomes,
-    }));
+    // Convert the groupedIncomes object to an array, filling in missing months
+    const monthlyIncomes = [];
+    for (let month = 1; month <= 12; month++) {
+      if (!groupedIncomes[month]) {
+        groupedIncomes[month] = { total: 0, incomes: [] };
+      }
+      monthlyIncomes.push({
+        month: Number(month),
+        total: groupedIncomes[month].total,
+        incomes: groupedIncomes[month].incomes,
+      });
+    }
 
     return res.status(200).json({ monthlyIncomes });
   } catch (error) {
