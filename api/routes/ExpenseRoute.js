@@ -3,7 +3,7 @@ const router = express.Router();
 
 const expenseController = require("../controllers/ExpenseController"); // Adjust path as needed
 
-router.post("/expense/", expenseController.createExpense);
+router.post("/user/:userId/expense/", expenseController.createExpense);
 router.put("/user/:userId/expense/:id", expenseController.updateExpense);
 router.delete("/user/:userId/expense/:id", expenseController.deleteExpense);
 

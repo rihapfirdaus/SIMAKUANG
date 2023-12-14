@@ -2,7 +2,8 @@ const Saving = require("../models/SavingModel.js");
 
 // Create a new saving
 const createSaving = async (req, res) => {
-  const { userId, amount, category, date, note } = req.body;
+  const userId = req.params.userId;
+  const { amount, category, date, note } = req.body;
 
   try {
     const saving = new Saving({ userId, amount, category, date, note });

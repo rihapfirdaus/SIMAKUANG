@@ -3,7 +3,7 @@ const router = express.Router();
 
 const savingController = require("../controllers/SavingController"); // Adjust path as needed
 
-router.post("/saving/", savingController.createSaving);
+router.post("/user/:userId/saving/", savingController.createSaving);
 router.put("/user/:userId/saving/:id", savingController.updateSaving);
 router.delete("/user/:userId/saving/:id", savingController.deleteSaving);
 

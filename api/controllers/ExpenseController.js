@@ -2,7 +2,8 @@ const Expense = require("../models/ExpenseModel.js");
 
 // Create a new expense
 const createExpense = async (req, res) => {
-  const { userId, amount, category, date, note } = req.body;
+  const userId = req.params.userId;
+  const { amount, category, date, note } = req.body;
 
   try {
     const expense = new Expense({ userId, amount, category, date, note });

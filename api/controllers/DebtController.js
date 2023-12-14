@@ -2,7 +2,8 @@ const Debt = require("../models/DebtModel.js");
 
 // Create a new debt
 const createDebt = async (req, res) => {
-  const { userId, debtor, creditor, amount, category, dueDate, status, note } =
+  const userId = req.params.userId;
+  const { debtor, creditor, amount, category, dueDate, status, note } =
     req.body;
 
   try {

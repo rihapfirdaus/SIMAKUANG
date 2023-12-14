@@ -3,7 +3,7 @@ const router = express.Router();
 
 const debtController = require("../controllers/DebtController"); // Adjust path as needed
 
-router.post("/debt/", debtController.createDebt);
+router.post("/user/:userId/debt/", debtController.createDebt);
 router.put("/user/:userId/debt/:id", debtController.updateDebt);
 router.delete("/user/:userId/debt/:id", debtController.deleteDebt);
 

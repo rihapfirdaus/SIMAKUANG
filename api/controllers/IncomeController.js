@@ -2,7 +2,8 @@ const Income = require("../models/IncomeModel.js");
 
 // Create a new income
 const createIncome = async (req, res) => {
-  const { userId, amount, category, date, note } = req.body;
+  const userId = req.params.userId;
+  const { amount, category, date, note } = req.body;
 
   try {
     const income = new Income({ userId, amount, category, date, note });
