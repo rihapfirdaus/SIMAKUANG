@@ -166,6 +166,7 @@ const getTotalDebtByUser = async (req, res) => {
   }
 };
 
+// Get total debt monthly by year (array)
 const getMonthlyDebtsByYear = async (req, res) => {
   const userId = req.params.userId;
   const year = req.query.year || new Date().getFullYear();
@@ -179,44 +180,36 @@ const getMonthlyDebtsByYear = async (req, res) => {
       },
     };
 
-    const debts = await Debt.find(match);
+    const debtss = await Debt.find(match);
 
-    if (!debts || debts.length === 0) {
-      return res.status(404).json({ message: "No debts found for user." });
+    if (!debtss || debtss.length === 0) {
+      return res.status(404).json({ message: "No debtss found for user." });
     }
 
-    // Group debts by month
     const groupedDebts = {};
-    debts.forEach((debt) => {
-      const month = debt.date.getMonth() + 1; // Months are 0-based in JavaScript Date
+    debtss.forEach((debts) => {
+      const month = debts.date.getMonth() + 1;
       if (!groupedDebts[month]) {
-        groupedDebts[month] = { total: 0, debts: [] };
+        groupedDebts[month] = { total: 0, debtss: [] };
       }
-      groupedDebts[month].total += debt.amount;
-      groupedDebts[month].debts.push({
-        amount: debt.amount,
-        date: debt.date,
-        category: debt.category,
-      });
+      groupedDebts[month].total += debts.amount;
     });
 
-    // Convert the groupedDebts object to an array, filling in missing months
     const monthlyDebts = [];
     for (let month = 1; month <= 12; month++) {
       if (!groupedDebts[month]) {
-        groupedDebts[month] = { total: 0, debts: [] };
+        groupedDebts[month] = { total: 0, debtss: [] };
       }
       monthlyDebts.push({
         month: Number(month),
         total: groupedDebts[month].total,
-        debts: groupedDebts[month].debts,
       });
     }
 
     return res.status(200).json({ monthlyDebts });
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ message: "Error fetching monthly debts." });
+    return res.status(500).json({ message: "Error fetching monthly debtss." });
   }
 };
 

@@ -182,22 +182,15 @@ const getMonthlyExpensesByYear = async (req, res) => {
       return res.status(404).json({ message: "No expenses found for user." });
     }
 
-    // Group expenses by month
     const groupedExpenses = {};
     expenses.forEach((expense) => {
-      const month = expense.date.getMonth() + 1; // Months are 0-based in JavaScript Date
+      const month = expense.date.getMonth() + 1;
       if (!groupedExpenses[month]) {
         groupedExpenses[month] = { total: 0, expenses: [] };
       }
       groupedExpenses[month].total += expense.amount;
-      groupedExpenses[month].expenses.push({
-        amount: expense.amount,
-        date: expense.date,
-        category: expense.category,
-      });
     });
 
-    // Convert the groupedExpenses object to an array, filling in missing months
     const monthlyExpenses = [];
     for (let month = 1; month <= 12; month++) {
       if (!groupedExpenses[month]) {
@@ -206,7 +199,6 @@ const getMonthlyExpensesByYear = async (req, res) => {
       monthlyExpenses.push({
         month: Number(month),
         total: groupedExpenses[month].total,
-        expenses: groupedExpenses[month].expenses,
       });
     }
 

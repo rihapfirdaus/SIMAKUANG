@@ -179,22 +179,15 @@ const getMonthlyIncomesByYear = async (req, res) => {
       return res.status(404).json({ message: "No incomes found for user." });
     }
 
-    // Group incomes by month
     const groupedIncomes = {};
     incomes.forEach((income) => {
-      const month = income.date.getMonth() + 1; // Months are 0-based in JavaScript Date
+      const month = income.date.getMonth() + 1;
       if (!groupedIncomes[month]) {
         groupedIncomes[month] = { total: 0, incomes: [] };
       }
       groupedIncomes[month].total += income.amount;
-      groupedIncomes[month].incomes.push({
-        amount: income.amount,
-        date: income.date,
-        category: income.category,
-      });
     });
 
-    // Convert the groupedIncomes object to an array, filling in missing months
     const monthlyIncomes = [];
     for (let month = 1; month <= 12; month++) {
       if (!groupedIncomes[month]) {
@@ -203,7 +196,6 @@ const getMonthlyIncomesByYear = async (req, res) => {
       monthlyIncomes.push({
         month: Number(month),
         total: groupedIncomes[month].total,
-        incomes: groupedIncomes[month].incomes,
       });
     }
 

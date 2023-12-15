@@ -187,22 +187,15 @@ const getMonthlySavingsByYear = async (req, res) => {
       return res.status(404).json({ message: "No savings found for user." });
     }
 
-    // Group savings by month
     const groupedSavings = {};
     savings.forEach((saving) => {
-      const month = saving.date.getMonth() + 1; // Months are 0-based in JavaScript Date
+      const month = saving.date.getMonth() + 1;
       if (!groupedSavings[month]) {
         groupedSavings[month] = { total: 0, savings: [] };
       }
       groupedSavings[month].total += saving.amount;
-      groupedSavings[month].savings.push({
-        amount: saving.amount,
-        date: saving.date,
-        category: saving.category,
-      });
     });
 
-    // Convert the groupedSavings object to an array, filling in missing months
     const monthlySavings = [];
     for (let month = 1; month <= 12; month++) {
       if (!groupedSavings[month]) {
@@ -211,7 +204,6 @@ const getMonthlySavingsByYear = async (req, res) => {
       monthlySavings.push({
         month: Number(month),
         total: groupedSavings[month].total,
-        savings: groupedSavings[month].savings,
       });
     }
 
