@@ -183,10 +183,6 @@ const getMonthlySavingsByYear = async (req, res) => {
 
     const savings = await Saving.find(match);
 
-    if (!savings || savings.length === 0) {
-      return res.status(404).json({ message: "No savings found for user." });
-    }
-
     const groupedSavings = {};
     savings.forEach((saving) => {
       const month = saving.date.getMonth() + 1;

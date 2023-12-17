@@ -178,10 +178,6 @@ const getMonthlyExpensesByYear = async (req, res) => {
 
     const expenses = await Expense.find(match);
 
-    if (!expenses || expenses.length === 0) {
-      return res.status(404).json({ message: "No expenses found for user." });
-    }
-
     const groupedExpenses = {};
     expenses.forEach((expense) => {
       const month = expense.date.getMonth() + 1;

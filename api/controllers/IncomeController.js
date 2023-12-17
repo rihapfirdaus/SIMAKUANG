@@ -175,10 +175,6 @@ const getMonthlyIncomesByYear = async (req, res) => {
 
     const incomes = await Income.find(match);
 
-    if (!incomes || incomes.length === 0) {
-      return res.status(404).json({ message: "No incomes found for user." });
-    }
-
     const groupedIncomes = {};
     incomes.forEach((income) => {
       const month = income.date.getMonth() + 1;

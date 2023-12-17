@@ -180,17 +180,13 @@ const getMonthlyDebtsByYear = async (req, res) => {
       },
     };
 
-    const debtss = await Debt.find(match);
-
-    if (!debtss || debtss.length === 0) {
-      return res.status(404).json({ message: "No debtss found for user." });
-    }
+    const debts = await Debt.find(match);
 
     const groupedDebts = {};
-    debtss.forEach((debts) => {
+    debts.forEach((debts) => {
       const month = debts.date.getMonth() + 1;
       if (!groupedDebts[month]) {
-        groupedDebts[month] = { total: 0, debtss: [] };
+        groupedDebts[month] = { total: 0, debts: [] };
       }
       groupedDebts[month].total += debts.amount;
     });
@@ -198,7 +194,7 @@ const getMonthlyDebtsByYear = async (req, res) => {
     const monthlyDebts = [];
     for (let month = 1; month <= 12; month++) {
       if (!groupedDebts[month]) {
-        groupedDebts[month] = { total: 0, debtss: [] };
+        groupedDebts[month] = { total: 0, debts: [] };
       }
       monthlyDebts.push({
         month: Number(month),
@@ -209,7 +205,7 @@ const getMonthlyDebtsByYear = async (req, res) => {
     return res.status(200).json({ monthlyDebts });
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ message: "Error fetching monthly debtss." });
+    return res.status(500).json({ message: "Error fetching monthly debts." });
   }
 };
 
