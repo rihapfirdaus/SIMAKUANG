@@ -38,7 +38,7 @@ const getSavingsByUser = async (req, res) => {
     } else if (year) {
       match.date = {
         $gte: new Date(year, 0, 1),
-        $lt: new Date(year + 1, 0, 1),
+        $lt: new Date(`${parseInt(year) + 1}-01-01`),
       };
     } else if (month) {
       match.date = {
