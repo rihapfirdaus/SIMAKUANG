@@ -13,6 +13,7 @@ const createDebt = async (req, res) => {
       creditor,
       amount,
       category,
+      date,
       dueDate,
       status,
       note,
@@ -76,7 +77,7 @@ const updateDebt = async (req, res) => {
   try {
     const debt = await Debt.findByIdAndUpdate(
       debtId,
-      { debtor, creditor, amount, category, dueDate, status, note },
+      { debtor, creditor, amount, category, date, dueDate, status, note },
       { userId }
     );
 

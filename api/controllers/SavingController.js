@@ -51,7 +51,7 @@ const getSavingsByUser = async (req, res) => {
 
     const savings = await Saving.find(match);
 
-    if (!savings || savings.length === 0) {
+    if (!savings) {
       return res.status(404).json({ message: "No savings found for user." });
     }
 
