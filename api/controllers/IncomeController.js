@@ -61,7 +61,7 @@ const getIncomesByUser = async (req, res) => {
 // Update an income
 const updateIncome = async (req, res) => {
   const incomeId = req.params.id;
-  const userId = req.user.id;
+  const userId = req.params.userId;
   const { amount, category, date, note } = req.body;
 
   try {
@@ -87,7 +87,7 @@ const updateIncome = async (req, res) => {
 // Delete an income
 const deleteIncome = async (req, res) => {
   const incomeId = req.params.id;
-  const userId = req.user.id;
+  const userId = req.params.userId;
 
   try {
     const income = await Income.findByIdAndDelete(incomeId, { userId });

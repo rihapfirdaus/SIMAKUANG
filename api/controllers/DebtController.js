@@ -69,7 +69,7 @@ const getDebtsByUser = async (req, res) => {
 // Update an debt
 const updateDebt = async (req, res) => {
   const debtId = req.params.id;
-  const userId = req.user.id;
+  const userId = req.params.userId;
   const { debtor, creditor, amount, category, dueDate, status, note } =
     req.body;
 
@@ -94,7 +94,7 @@ const updateDebt = async (req, res) => {
 // Delete an debt
 const deleteDebt = async (req, res) => {
   const debtId = req.params.id;
-  const userId = req.user.id;
+  const userId = req.params.userId;
 
   try {
     const debt = await Debt.findByIdAndDelete(debtId, { userId });

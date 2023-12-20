@@ -65,7 +65,7 @@ const getSavingsByUser = async (req, res) => {
 // Update an saving
 const updateSaving = async (req, res) => {
   const savingId = req.params.id;
-  const userId = req.user.id;
+  const userId = req.params.userId;
   const { amount, category, date, note } = req.body;
 
   try {
@@ -91,7 +91,7 @@ const updateSaving = async (req, res) => {
 // Delete an saving
 const deleteSaving = async (req, res) => {
   const savingId = req.params.id;
-  const userId = req.user.id;
+  const userId = req.params.userId;
 
   try {
     const saving = await Saving.findByIdAndDelete(savingId, { userId });
