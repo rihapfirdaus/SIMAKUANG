@@ -29,7 +29,7 @@ export default ({ name, label, value, setValue }) => {
     <TextField
       size={breakpoint ? "medium" : "small"}
       error={!validation.valid}
-      helperText={validation.errorMessage}
+      helperText={validation.errorMessage || " "}
       name={name}
       label={label}
       type={showPassword ? "text" : "password"}

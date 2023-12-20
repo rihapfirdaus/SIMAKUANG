@@ -28,25 +28,25 @@ export default () => {
       key: "home",
       icon: <Home />,
       text: "Beranda",
-      to: `/app/${user.uid}/home`,
+      to: `/app/${user._id}/home`,
     },
     {
       key: "notes",
       icon: <Notes />,
       text: "Catatan",
-      to: `/app/${user.uid}/notes`,
+      to: `/app/${user._id}/notes/expense`,
     },
     {
       key: "statistic",
       icon: <BarChart />,
       text: "Statistik",
-      to: `/app/${user.uid}/statistic`,
+      to: `/app/${user._id}/statistic`,
     },
     {
       key: "profile",
       icon: <AccountCircle />,
       text: "Profil",
-      to: `/app/${user.uid}/profile`,
+      to: `/app/${user._id}/profile`,
     },
   ];
 

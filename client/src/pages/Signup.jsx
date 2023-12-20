@@ -51,7 +51,8 @@ export async function action({ request }) {
         email: email,
         displayName: name,
       };
-      const response = await axios.post(apiUrl, requestBody);
+
+      await axios.post(apiUrl, requestBody);
 
       // console.log(response.data);
       authStatus = true;
@@ -89,39 +90,41 @@ export function Signup() {
         <AppsIcon isCenter={true} />
         <p className="mt-4 py-4">Buat akun Anda</p>
         <Form method="post">
-          <Stack spacing={2}>
-            <EmailField value={email} setValue={setEmail} />
-            <TextFieldWithValidation
-              name="name"
-              label="Nama"
-              value={name}
-              setValue={setName}
-            />
-            <PasswordField
-              name="password"
-              label="Password"
-              value={password}
-              setValue={setPassword}
-            />
-            <PasswordField
-              name="repassword"
-              label="Ulangi Password"
-              value={repassword}
-              setValue={setRepassword}
-            />
-            <FormControlLabel
-              required
-              control={<Checkbox color="success" size="small" />}
-              label={
-                <span style={{ fontSize: "medium" }}>
-                  Saya menyetujui{" "}
-                  <Link className="text-green-900 hover:underline">
-                    Syarat & Ketentuan
-                  </Link>{" "}
-                  yang berlaku
-                </span>
-              }
-            />
+          <Stack spacing={1.5}>
+            <Stack spacing={0.25}>
+              <EmailField value={email} setValue={setEmail} />
+              <TextFieldWithValidation
+                name="name"
+                label="Nama"
+                value={name}
+                setValue={setName}
+              />
+              <PasswordField
+                name="password"
+                label="Password"
+                value={password}
+                setValue={setPassword}
+              />
+              <PasswordField
+                name="repassword"
+                label="Ulangi Password"
+                value={repassword}
+                setValue={setRepassword}
+              />
+              <FormControlLabel
+                required
+                control={<Checkbox color="success" size="small" />}
+                label={
+                  <span style={{ fontSize: "medium" }}>
+                    Saya menyetujui{" "}
+                    <Link className="text-green-900 hover:underline">
+                      Syarat & Ketentuan
+                    </Link>{" "}
+                    yang berlaku
+                  </span>
+                }
+              />
+            </Stack>
             <Button
               type="submit"
               size="large"
@@ -134,7 +137,7 @@ export function Signup() {
             <Alert
               severity="error"
               sx={{
-                visibility: errors ? "display" : "hidden",
+                visibility: errors ? "visible" : "hidden",
                 display: "flex",
                 justifyContent: "center",
               }}

@@ -1,238 +1,450 @@
-import React, { useState } from "react";
-import { Form } from "react-router-dom";
+import React, { useEffect, useState } from "react";
 import {
-  Stack,
+  Form,
+  Link,
+  Outlet,
+  redirect,
+  useLoaderData,
+  useLocation,
+  useParams,
+} from "react-router-dom";
+import {
+  Box,
   Button,
-  FormControl,
+  LinearProgress,
+  Modal,
+  Snackbar,
+  Stack,
+  Typography,
   List,
   ListItemButton,
   ListItemIcon,
   ListItemText,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
-import SelectField from "../components/SelectField";
-import TextSelectField from "../components/TextSelectField";
-import StringField from "../components/StringField";
-import AreaField from "../components/AreaField";
-import CurrencyField from "../components/CurrencyField";
-import DateField from "../components/DateField";
-import { DataGrid, GridToolbar } from "@mui/x-data-grid";
-import { Box } from "@mui/system";
-import SectionLabel from "../components/SectionLabel";
+import {
+  DataGrid,
+  GridFooterContainer,
+  GridPagination,
+  GridRowModes,
+  GridToolbarContainer,
+  GridToolbarExport,
+  GridToolbarQuickFilter,
+  GridActionsCellItem,
+  GridRowEditStopReasons,
+} from "@mui/x-data-grid";
+import axios from "axios";
+import { LineChart } from "@mui/x-charts";
 import { CreditCard, Savings, ShoppingCart, Wallet } from "@mui/icons-material";
+import moment from "moment";
+import FormRecord from "../components/FormRecord";
+
+import Recap from "../components/Recap";
+import SelectField from "../components/SelectField";
+import DateField from "../components/DateField";
+import SectionLabel from "../components/SectionLabel";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/DeleteOutlined";
+import SaveIcon from "@mui/icons-material/Save";
+import CancelIcon from "@mui/icons-material/Close";
+import { display } from "@mui/system";
+
+export async function loader({ params }) {
+  const today = new Date();
+  const thisMonth = today.getMonth() + 1;
+  const thisYear = today.getFullYear();
+
+  const uid = params?.userId;
+  const type = params?.type;
+
+  try {
+    const apiUrls = [
+      `https://saldo-siaga-api.vercel.app/user/${uid}/${type}`,
+      `https://saldo-siaga-api.vercel.app/user/${uid}/${type}/total`,
+      `https://saldo-siaga-api.vercel.app/user/${uid}/${type}/total?year=${thisYear}&month=${thisMonth}`,
+      `https://saldo-siaga-api.vercel.app/user/${uid}/${type}/total/all/months`,
+    ];
+
+    const [allNote, totalNote, totalNoteByMonth, totalNoteEachMonth] =
+      await Promise.all(apiUrls.map((url) => axios.get(url)));
+
+    let notes;
+    let total;
+    let totalByMonth;
+    let totalEachMonth;
+
+    switch (type) {
+      case "expense":
+        notes = allNote.data.expenses;
+        total = totalNote.data.expense;
+        totalByMonth = totalNoteByMonth.data.expense;
+        totalEachMonth = totalNoteEachMonth.data.monthlyExpenses;
+        break;
+      case "income":
+        notes = allNote.data.incomes;
+        total = totalNote.data.income;
+        totalByMonth = totalNoteByMonth.data.income;
+        totalEachMonth = totalNoteEachMonth.data.monthlyIncomes;
+        break;
+      case "debt":
+        notes = allNote.data.debts;
+        total = totalNote.data.debt;
+        totalByMonth = totalNoteByMonth.data.debt;
+        totalEachMonth = totalNoteEachMonth.data.monthlyDebts;
+        break;
+      case "saving":
+        notes = allNote.data.savings;
+        total = totalNote.data.saving;
+        totalByMonth = totalNoteByMonth.data.saving;
+        totalEachMonth = totalNoteEachMonth.data.monthlySavings;
+        console.log(totalNoteEachMonth.data.monthlySavings);
+        break;
+    }
+
+    return {
+      notes,
+      total,
+      totalByMonth,
+      totalEachMonth,
+    };
+  } catch (error) {
+    console.error("Error fetching user data:", error);
+    return { error };
+  }
+}
+
+export async function action({ request, params }) {
+  const uid = params?.userId;
+  const type = params?.type;
+
+  try {
+    const formData = await request.formData();
+    const updates = Object.fromEntries(formData);
+
+    let requestBody;
+
+    const amount = updates.amount;
+    const note = updates.note;
+
+    if (type === "debt") {
+      const debtor = updates.debtor;
+      const creditor = updates.creditor;
+      const date =
+        moment(updates.startDate, "DD/MM/YYYY").format("YYYY-MM-DD") ||
+        new Date();
+      const dueDate =
+        moment(updates.endDate, "DD/MM/YYYY").format("YYYY-MM-DD") ||
+        new Date();
+
+      requestBody = {
+        debtor,
+        creditor,
+        amount,
+        category,
+        date,
+        dueDate,
+        note,
+      };
+    } else {
+      const category = updates.category;
+      const date =
+        moment(updates.date, "DD/MM/YYYY").format("YYYY-MM-DD") || new Date();
+
+      requestBody = {
+        amount,
+        category,
+        date,
+        note,
+      };
+    }
+    const apiUrl = `https://saldo-siaga-api.vercel.app/user/${uid}/${type}`;
+    await axios.post(apiUrl, requestBody);
+    return { status: "201", message: "Data berhasil ditambahkan" };
+  } catch (error) {
+    return {
+      status: "404",
+      message: "Data gagal ditambahkan, Silahkan coba lagi.",
+      error: error,
+    };
+  }
+}
 
 export default () => {
-  const [recordType, setRecordType] = useState("expenses");
-  const [date, setDate] = useState(new Date());
-  const [dateline, setDateline] = useState(new Date());
-  const [amount, setAmount] = useState("");
-  const [debtor, setDebtor] = useState("");
-  const [creditor, setCreditor] = useState("");
-  const [notes, setNotes] = useState("");
-  const [category, setCategory] = useState("");
-  const [savingType, setSavingType] = useState("increase");
+  const { userId, type } = useParams();
+  const { notes, total, totalByMonth, totalEachMonth } = useLoaderData();
+  const [open, setOpen] = React.useState(false);
+  const [option, setOption] = React.useState("month");
+  const [loading, setLoading] = React.useState(false);
+  const [rows, setRows] = React.useState([]);
+  const [alert, setAlert] = React.useState("");
+  const [show, setShow] = React.useState(false);
 
-  const record =
-    recordType === "expenses"
-      ? "Pengeluaran"
-      : recordType === "incomes"
-      ? "Pemasukan"
-      : recordType === "savings"
-      ? "Tabungan"
-      : "Pinjaman";
-
-  const optionSavings = [
-    { value: "increase", label: "Tabungan Masuk" },
-    { value: "decrease", label: "Tabungan Keluar" },
-  ];
-
-  const optionRecords = [
-    {
-      value: "expenses",
-      label: "Uang Keluar",
-    },
-    {
-      value: "incomes",
-      label: "Uang Masuk",
-    },
-    {
-      value: "savings",
-      label: "Tabungan",
-    },
-    {
-      value: "debts",
-      label: "Pinjaman",
-    },
-  ];
-  const categories = [
-    { title: "food" },
-    { title: "drink" },
-    { title: "laundry" },
-    { title: "breakfast" },
-    { title: "lunch" },
-    { title: "dinner" },
-  ];
-  const dateFormatter = new Intl.DateTimeFormat("in-IN", {
-    day: "numeric",
-    month: "short",
-    year: "2-digit",
+  const [data, setData] = React.useState({
+    month: new Date().getMonth(),
+    year: new Date().getFullYear(),
+    startDate: new Date(),
+    endDate: new Date(),
   });
-  const currencyFormatter = new Intl.NumberFormat("in-IN", {
-    style: "currency",
-    currency: "IDR",
-  });
+
+  const [month, setMonth] = React.useState(new Date().getMonth());
+  const [year, setYear] = React.useState(new Date().getFullYear());
+  const [startDate, setStartDate] = React.useState(new Date());
+  const [endDate, setEndDate] = React.useState(new Date());
+
+  useEffect(() => {
+    setLoading(true);
+    const getExpenses = async () => {
+      try {
+        let apiUrl;
+
+        switch (option) {
+          case "month":
+            apiUrl = `https://saldo-siaga-api.vercel.app/user/${userId}/${type}?year=${
+              data.year
+            }&month=${data.month + 1}`;
+            break;
+          case "year":
+            apiUrl = `https://saldo-siaga-api.vercel.app/user/${userId}/${type}?year=${data.year}`;
+            break;
+          case "period":
+            apiUrl = `https://saldo-siaga-api.vercel.app/user/${userId}/${type}?startDate=${data.startDate}&endDate=${data.endDate}`;
+            break;
+          default:
+            apiUrl = `https://saldo-siaga-api.vercel.app/user/${userId}/${type}`;
+            break;
+        }
+
+        const response = await axios.get(apiUrl);
+        switch (type) {
+          case "expense":
+            setRows(response.data.expenses);
+            break;
+          case "income":
+            setRows(response.data.incomes);
+            break;
+          case "debt":
+            setRows(response.data.debts);
+            break;
+          case "saving":
+            setRows(response.data.savings);
+            break;
+        }
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    getExpenses();
+  }, [data, notes]);
+
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
+  const handleHide = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setShow(false);
+  };
+  const handleSubmit = () => {
+    option === "month"
+      ? setData({ month: month, year: year })
+      : option === "year"
+      ? setData({ year: year })
+      : setData({ startDate: startDate, endDate: endDate });
+    handleClose();
+  };
+
+  const columns = [
+    {
+      field: "date",
+      headerName: "Tanggal",
+      type: "date",
+      flex: 0.5,
+      headerAlign: "center",
+      align: "center",
+      editable: true,
+      valueFormatter: (params) => dateFormatter.format(new Date(params.value)),
+    },
+    {
+      field: "category",
+      headerName: "Kategori",
+      flex: 0.5,
+      align: "left",
+      editable: true,
+      headerAlign: "center",
+    },
+    {
+      field: "amount",
+      headerName: "Jumlah",
+      type: "number",
+      headerAlign: "center",
+      flex: 0.5,
+      editable: true,
+      valueFormatter: ({ value }) => currencyFormatter.format(value),
+    },
+    {
+      field: "note",
+      headerName: "Deskripsi",
+      flex: 0.8,
+      align: "left",
+      editable: true,
+      headerAlign: "center",
+    },
+    {
+      field: "actions",
+      type: "actions",
+      headerName: "Actions",
+      headerAlign: "center",
+      cellClassName: "actions",
+      getActions: ({ id }) => {
+        return [
+          <GridActionsCellItem
+            icon={<EditIcon />}
+            component={Link}
+            to={`/app/${userId}/notes/${type}/update/${id}`}
+            type="submit"
+            label="Edit"
+            color="inherit"
+          />,
+          <GridActionsCellItem
+            icon={<DeleteIcon />}
+            component={Link}
+            to={`/app/${userId}/notes/${type}/delete/${id}`}
+            type="submit"
+            label="Delete"
+            color="inherit"
+          />,
+        ];
+      },
+    },
+  ];
+
+  const xLabels = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "Mei",
+    "Jun",
+    "Jul",
+    "Agu",
+    "Sep",
+    "Okt",
+    "Nov",
+    "Des",
+  ];
+  const customToolbar = () => {
+    return (
+      <>
+        <GridToolbarContainer sx={{ p: 2 }}>
+          <SectionLabel
+            label={
+              option === "month"
+                ? `Bulan ${monthYearFormatter.format(
+                    new Date(data.year, data.month + 1, 0)
+                  )}`
+                : option === "year"
+                ? `Tahun ${data.year}`
+                : `${dateFormatter.format(
+                    data.startDate
+                  )} - ${dateFormatter.format(data.endDate)}`
+            }
+            className="flex justify-center content-center w-full"
+          />
+        </GridToolbarContainer>
+        <GridToolbarContainer
+          sx={{ display: "flex", justifyContent: "space-between", mx: 1 }}
+        >
+          <Button onClick={handleOpen}>Filter</Button>
+
+          <GridToolbarQuickFilter />
+        </GridToolbarContainer>
+      </>
+    );
+  };
+
+  const customFooter = () => {
+    return (
+      <GridFooterContainer sx={{ mx: 1 }}>
+        <GridToolbarExport />
+        <GridPagination />
+      </GridFooterContainer>
+    );
+  };
+  const xxl = useMediaQuery(useTheme().breakpoints.up("xl"));
+  const xl = useMediaQuery(useTheme().breakpoints.up("lg"));
+  const lg = useMediaQuery(useTheme().breakpoints.up("md"));
+  const md = useMediaQuery(useTheme().breakpoints.up("sm"));
 
   return (
-    <div className="px-4">
-      <SectionLabel label="Tambah Catatan" />
-      <Form method="post" className="border-2 p-4 rounded-3xl">
-        <Stack spacing={2}>
-          <FormControl>
-            <SelectField
-              label="Tipe Catatan"
-              value={recordType}
-              setValue={setRecordType}
-              options={optionRecords}
-            />
-          </FormControl>
-
-          <FormControl>
-            {recordType === "debts" ? (
-              <Stack direction="row" spacing={2}>
-                <DateField
-                  label={`Tanggal ${record}`}
-                  value={date}
-                  setValue={setDate}
-                />
-                <DateField
-                  label="Tenggat"
-                  value={dateline}
-                  setValue={setDateline}
-                  isDateline={true}
-                />
-              </Stack>
-            ) : (
-              <DateField
-                label={`Tanggal ${record}`}
-                value={date}
-                setValue={setDate}
-              />
-            )}
-          </FormControl>
-
-          <FormControl>
-            <CurrencyField
-              name="amount"
-              label={`Jumlah ${record}`}
-              value={amount}
-              setValue={setAmount}
-            />
-          </FormControl>
-
-          <FormControl>
-            {recordType === "debts" ? (
-              <Stack direction="row" spacing={2}>
-                <StringField
-                  name="debtor"
-                  label="Penerima Pinjaman"
-                  value={debtor}
-                  setValue={setDebtor}
-                />
-                <StringField
-                  name="creditor"
-                  label="Pemberi Pinjaman"
-                  value={creditor}
-                  setValue={setCreditor}
-                />
-              </Stack>
-            ) : recordType === "savings" ? (
-              <SelectField
-                label={`Tipe ${record}`}
-                value={savingType}
-                setValue={setSavingType}
-                options={optionSavings}
-              />
-            ) : (
-              <TextSelectField
-                label={`Tipe ${record}`}
-                value={category}
-                setValue={setCategory}
-                options={categories}
-              />
-            )}
-          </FormControl>
-
-          <FormControl>
-            <AreaField
-              name={notes}
-              label="Deskripsi (opsional)"
-              value={notes}
-              setValue={setNotes}
-            />
-          </FormControl>
-
-          <Button
-            type="submit"
-            size="small"
-            variant="contained"
-            color="success"
-            onClick={() => {}}
-            sx={{ my: 2, p: 1.5 }}
-          >
-            Tambah Catatan
-          </Button>
-        </Stack>
-      </Form>
-      <SectionLabel label="Lihat Catatan" />
-
-      {/* <Box className="border-2  px-4 rounded-lg p-4" sx={{ height: 400 }}>
-        <DataGrid
-          getRowHeight={() => "auto"}
-          columns={[
-            {
-              field: "date",
-              headerName: "Tanggal",
-              flex: 1,
-              type: "date",
-              valueFormatter: (params) =>
-                dateFormatter.format(new Date(params.value)),
-            },
-            { field: "category", headerName: "Kategori", flex: 1 },
-            {
-              field: "amount",
-              headerName: "Jumlah",
-              flex: 1,
-              type: "number",
-              valueFormatter: ({ value }) => currencyFormatter.format(value),
-              cellClassName: "font-tabular-nums",
-            },
-          ]}
-          rows={row}
-        />
-      </Box> */}
+    <div className="p-4">
       <Box>
-        <List className="border-2 px-4 rounded-3xl">
-          <ListItemButton>
+        <List
+          className="flex border-2 rounded-3xl"
+          sx={{
+            "& .Mui-selected .MuiListItemIcon-root, .Mui-selected .MuiListItemText-root, .Mui-selected .MuiListItemText-primary, .Mui-selected .MuiListItemText-secondary":
+              {
+                color: "darkgreen",
+                fontWeight: "bold",
+              },
+            "& .MuiListItemButton-root": {
+              borderRadius: 4,
+              mx: 1,
+            },
+            "& .MuiListItemIcon-root": {
+              width: xl ? "" : "100%",
+              display: "flex",
+              justifyContent: "center",
+            },
+            "& .MuiListItemText-secondary": {
+              display: xxl ? "block" : "none",
+            },
+            "& .MuiListItemText-root": {
+              display: xl ? "block" : "none",
+            },
+          }}
+        >
+          <ListItemButton
+            LinkComponent={Link}
+            to={`/app/${userId}/notes/expense`}
+            selected={type === "expense"}
+          >
+            <ListItemIcon>{<ShoppingCart />}</ListItemIcon>
+            <ListItemText
+              primary="Pengeluaran"
+              secondary={"Lihat untuk apa uang Anda dihabiskan"}
+            />
+          </ListItemButton>
+          <ListItemButton
+            LinkComponent={Link}
+            to={`/app/${userId}/notes/income`}
+            selected={type === "income"}
+          >
             <ListItemIcon>{<Wallet />}</ListItemIcon>
             <ListItemText
               primary="Pemasukan"
               secondary={"Lacak uang yang masuk ke dompet Anda"}
             />
           </ListItemButton>
-          <ListItemButton>
-            <ListItemIcon>{<ShoppingCart />}</ListItemIcon>
-            <ListItemText
-              primary="Uang Keluar"
-              secondary={"Lihat untuk apa uang Anda dihabiskan"}
-            />
-          </ListItemButton>
-          <ListItemButton>
+          <ListItemButton
+            LinkComponent={Link}
+            to={`/app/${userId}/notes/saving`}
+            selected={type === "saving"}
+          >
             <ListItemIcon>{<Savings />}</ListItemIcon>
             <ListItemText
               primary="Tabungan"
               secondary={"Kelola dan lihat tabungan Anda"}
             />
           </ListItemButton>
-          <ListItemButton>
+          <ListItemButton
+            LinkComponent={Link}
+            to={`/app/${userId}/notes/debt`}
+            selected={type === "debt"}
+          >
             <ListItemIcon>{<CreditCard />}</ListItemIcon>
             <ListItemText
               primary="Pinjaman"
@@ -241,49 +453,142 @@ export default () => {
           </ListItemButton>
         </List>
       </Box>
+      <Box className="lg:grid lg:grid-cols-3">
+        <FormRecord className="lg:col-span-2 mt-4 lg:mr-4" />
+        <Box className="hidden lg:block">
+          <Recap label="Pemasukan Bulan Ini" number={totalByMonth} />
+          <Box className="flex flex-col justify-center items-center border-2 p-4 rounded-3xl">
+            <Typography
+              sx={{
+                fontWeight: "bold",
+                color: "darkgreen",
+
+                textAlign: "center",
+              }}
+              children="Statistik Tahun Ini"
+            />
+
+            <LineChart
+              colors={["lightgreen", "darkgreen"]}
+              height={300}
+              dataset={totalEachMonth}
+              series={[{ dataKey: "total", label: "pemasukan" }]}
+              xAxis={[{ scaleType: "point", data: xLabels }]}
+              slotProps={{
+                legend: { hidden: true },
+              }}
+              margin={{
+                left: 55,
+              }}
+            />
+          </Box>
+        </Box>
+      </Box>
+      <Box
+        className="mt-4"
+        sx={{
+          height: 500,
+          width: "100%",
+          "& .actions": {
+            color: "text.secondary",
+          },
+          "& .textPrimary": {
+            color: "text.primary",
+          },
+        }}
+      >
+        <DataGrid
+          rows={rows}
+          getRowId={(row) => row._id}
+          columns={columns}
+          editMode="row"
+          slots={{
+            toolbar: customToolbar,
+            footer: customFooter,
+            loadingOverlay: LinearProgress,
+          }}
+          loading={loading}
+          disableDensitySelector
+          autoPageSize
+          sx={{
+            borderRadius: 6,
+          }}
+          initialState={{
+            sorting: {
+              sortModel: [{ field: "date", sort: "desc" }],
+            },
+          }}
+        />
+      </Box>
+      <Modal
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: 500,
+            bgcolor: "background.paper",
+            border: "2px solid #000",
+            boxShadow: 24,
+            p: 4,
+          }}
+        >
+          <Stack spacing={1}>
+            <SelectField
+              defaultValue={option}
+              setValue={setOption}
+              options={[
+                { value: "month", label: "Bulan" },
+                { value: "year", label: "Tahun" },
+                { value: "periode", label: "Periode" },
+              ]}
+            />
+            {option === "month" ? (
+              <Stack direction="row" spacing={1}>
+                <DateField value={month} setValue={setMonth} month />
+                <DateField value={year} setValue={setYear} year />
+              </Stack>
+            ) : option === "year" ? (
+              <DateField value={year} setValue={setYear} year />
+            ) : (
+              <Stack direction="row" spacing={1}>
+                <DateField value={startDate} setValue={setStartDate} />
+                <DateField value={endDate} setValue={setEndDate} />
+              </Stack>
+            )}
+          </Stack>
+          <Button onClick={handleSubmit}>Simpan</Button>
+          <Button onClick={handleClose}>Batal</Button>
+        </Box>
+      </Modal>
+      <Outlet></Outlet>
+      <Snackbar
+        open={show}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        autoHideDuration={3000}
+        onClose={handleHide}
+        message={alert}
+      />
     </div>
   );
 };
 
-const row = [
-  { id: "1", date: "2023-12-08", category: "Groceries", amount: 50.25 },
-  { id: "2", date: "2023-12-09", category: "Electronics", amount: 120.75 },
-  { id: "3", date: "2023-12-10", category: "Clothing", amount: 35.5 },
-  { id: "4", date: "2023-12-11", category: "Home Decor", amount: 75.0 },
-  { id: "5", date: "2023-12-12", category: "Books", amount: 22.9 },
-  { id: "6", date: "2023-12-13", category: "Health", amount: 45.6 },
-  { id: "7", date: "2023-12-14", category: "Sports", amount: 65.3 },
-  { id: "8", date: "2023-12-15", category: "Toys", amount: 30.8 },
-  { id: "9", date: "2023-12-16", category: "Stationery", amount: 15.75 },
-  { id: "10", date: "2023-12-17", category: "Furniture", amount: 110.2 },
-  { id: "11", date: "2023-12-18", category: "Beauty", amount: 40.5 },
-  { id: "12", date: "2023-12-19", category: "Jewelry", amount: 90.75 },
-  { id: "13", date: "2023-12-20", category: "Pet Supplies", amount: 25.4 },
-  { id: "14", date: "2023-12-21", category: "Appliances", amount: 150.0 },
-  { id: "15", date: "2023-12-22", category: "Music", amount: 18.25 },
-  { id: "16", date: "2023-12-23", category: "Automotive", amount: 80.6 },
-  { id: "17", date: "2023-12-24", category: "Movies", amount: 55.3 },
-  { id: "18", date: "2023-12-25", category: "Electronics", amount: 120.0 },
-  { id: "19", date: "2023-12-26", category: "Clothing", amount: 42.9 },
-  { id: "20", date: "2023-12-27", category: "Books", amount: 28.6 },
-  { id: "21", date: "2023-12-28", category: "Home Decor", amount: 95.75 },
-  { id: "22", date: "2023-12-29", category: "Toys", amount: 50.2 },
-  { id: "23", date: "2023-12-30", category: "Health", amount: 35.5 },
-  { id: "24", date: "2023-12-31", category: "Sports", amount: 75.8 },
-  { id: "25", date: "2024-01-01", category: "Stationery", amount: 20.25 },
-  { id: "26", date: "2024-01-02", category: "Furniture", amount: 130.5 },
-  { id: "27", date: "2024-01-03", category: "Beauty", amount: 48.75 },
-  { id: "28", date: "2024-01-04", category: "Jewelry", amount: 85.4 },
-  { id: "29", date: "2024-01-05", category: "Pet Supplies", amount: 32.0 },
-  { id: "30", date: "2024-01-06", category: "Appliances", amount: 170.25 },
-  { id: "31", date: "2024-01-07", category: "Music", amount: 25.6 },
-  { id: "32", date: "2024-01-08", category: "Automotive", amount: 95.3 },
-  { id: "33", date: "2024-01-09", category: "Movies", amount: 62.8 },
-  { id: "34", date: "2024-01-10", category: "Electronics", amount: 110.0 },
-  { id: "35", date: "2024-01-11", category: "Clothing", amount: 38.9 },
-  { id: "36", date: "2024-01-12", category: "Books", amount: 20.6 },
-  { id: "37", date: "2024-01-13", category: "Home Decor", amount: 85.75 },
-  { id: "38", date: "2024-01-14", category: "Toys", amount: 40.2 },
-  { id: "39", date: "2024-01-15", category: "Health", amount: 30.5 },
-  { id: "40", date: "2024-01-16", category: "Sports", amount: 70.8 },
-];
+const dateFormatter = new Intl.DateTimeFormat("in-IN", {
+  day: "numeric",
+  month: "short",
+  year: "2-digit",
+});
+const currencyFormatter = new Intl.NumberFormat("in-IN", {
+  style: "currency",
+  currency: "IDR",
+});
+const monthYearFormatter = new Intl.DateTimeFormat("in-IN", {
+  month: "long",
+  year: "numeric",
+});

@@ -1,16 +1,27 @@
 import { Typography } from "@mui/material";
 import React from "react";
-import SectionLabel from "./SectionLabel";
 
-export default ({ label, number }) => {
+export default ({ label, number, className }) => {
+  const currencyFormatter = new Intl.NumberFormat("in-IN", {
+    style: "currency",
+    currency: "IDR",
+    notation: "compact",
+    compactDisplay: "short",
+  });
   return (
-    <div className="my-4">
-      <SectionLabel label={label} isCenter />
-      <div className="flex items-stretch justify-between border-2 px-4 py-8 rounded-3xl">
-        <p className="self-start">Rp.</p>
-        <h1 className="text-5xl text-end">{number || "0"}</h1>
-        <p className="self-end">,00</p>
-      </div>
+    <div className={`my-4 ${className} border-2 rounded-3xl p-4`}>
+      <Typography
+        sx={{
+          fontWeight: "bold",
+          color: "darkgreen",
+          mb: 2,
+          textAlign: "center",
+        }}
+        children={label}
+      />
+      <h1 className="text-4xl text-center">
+        {currencyFormatter.format(number || 0)}
+      </h1>
     </div>
   );
 };

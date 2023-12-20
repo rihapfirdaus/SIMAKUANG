@@ -7,7 +7,14 @@ import {
   useTheme,
 } from "@mui/material";
 
-export default ({ label, value, defaultValue, setValue, options }) => {
+export default ({
+  label,
+  value,
+  defaultValue,
+  setValue,
+  options,
+  required,
+}) => {
   const breakpoint = useMediaQuery(useTheme().breakpoints.up("md"));
 
   return (
@@ -23,6 +30,7 @@ export default ({ label, value, defaultValue, setValue, options }) => {
           e.preventDefault();
           setValue(e.target.value);
         }}
+        required={required}
       >
         {options.map((option) => (
           <MenuItem key={option.value} value={option.value}>

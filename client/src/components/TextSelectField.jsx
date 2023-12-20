@@ -7,7 +7,7 @@ import {
   useMediaQuery,
 } from "@mui/material";
 
-export default ({ label, value, setValue, options }) => {
+export default ({ label, value, setValue, options, name }) => {
   const filter = createFilterOptions();
   const breakpoint = useMediaQuery(useTheme().breakpoints.up("md"));
 
@@ -61,7 +61,7 @@ export default ({ label, value, setValue, options }) => {
       renderOption={(props, option) => <li {...props}>{option.title}</li>}
       freeSolo
       renderInput={(params) => (
-        <TextField {...params} label={label} color="success" />
+        <TextField {...params} label={label} name={name} color="success" />
       )}
     />
   );

@@ -11,6 +11,7 @@ export default ({ name, label, value, setValue }) => {
       label={label}
       rows={2}
       color="success"
+      sx={{ width: "100%" }}
       value={value}
       onInput={(e) => {
         setValue(e.target.value);

@@ -13,8 +13,11 @@ export default () => {
   React.useEffect(() => {
     // Update the selected value based on the current pathname
     const pathSegments = location.pathname.split("/");
-    const key = pathSegments[pathSegments.length - 1];
-
+    const key =
+      pathSegments[pathSegments.length - 2] === "notes"
+        ? pathSegments[pathSegments.length - 2]
+        : pathSegments[pathSegments.length - 1];
+    console.log(key);
     // Map the key to the index of BottomNavigationAction
     const indexMap = {
       home: 0,
@@ -48,28 +51,28 @@ export default () => {
       >
         <BottomNavigationAction
           component={Link}
-          to={`/app/${user.uid}/home`}
+          to={`/app/${user._id}/home`}
           key="beranda"
           label="Beranda"
           icon={<Home />}
         />
         <BottomNavigationAction
           component={Link}
-          to={`/app/${user.uid}/notes`}
+          to={`/app/${user._id}/notes/expense`}
           key="catatan"
           label="Catatan"
           icon={<Notes />}
         />
         <BottomNavigationAction
           component={Link}
-          to={`/app/${user.uid}/statistic`}
+          to={`/app/${user._id}/statistic`}
           key="statistik"
           label="Statistik"
           icon={<BarChart />}
         />
         <BottomNavigationAction
           component={Link}
-          to={`/app/${user.uid}/profile`}
+          to={`/app/${user._id}/profile`}
           key="profil"
           label="Profil"
           icon={<AccountCircle />}

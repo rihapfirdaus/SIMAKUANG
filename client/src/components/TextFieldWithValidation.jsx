@@ -15,12 +15,13 @@ export default ({ name, label, value, setValue }) => {
     <TextField
       size={breakpoint ? "medium" : "small"}
       error={!validation.valid}
-      helperText={validation.errorMessage}
+      helperText={validation.errorMessage || " "}
       name={name}
       label={label}
       type="text"
       color="success"
       value={value}
+      sx={{ width: "100%" }}
       onInput={(e) => {
         setValue(e.target.value);
         setValidation(InputValidation(e.target.value));

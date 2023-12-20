@@ -11,11 +11,10 @@ export async function loader({ params }) {
 
   try {
     const response = await axios.get(
-      `https://saldo-siaga-api.vercel.app/user/uid/${uid}`
+      `https://saldo-siaga-api.vercel.app/user/id/${uid}`
     );
     const user = response.data;
 
-    // console.log(user);
     return { user };
   } catch (error) {
     console.error("Error fetching user data:", error);

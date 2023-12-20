@@ -14,7 +14,7 @@ export default ({ name, label, value, setValue }) => {
     <TextField
       size={breakpoint ? "medium" : "small"}
       error={!validation.valid}
-      helperText={validation.errorMessage}
+      helperText={validation.errorMessage || " "}
       label={label || "Email"}
       type="email"
       color="success"

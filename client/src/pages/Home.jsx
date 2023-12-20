@@ -1,21 +1,76 @@
 import React from "react";
-import { useRouteLoaderData } from "react-router-dom";
+import { useLoaderData, useRouteLoaderData } from "react-router-dom";
 import { Box, Typography, useMediaQuery } from "@mui/material";
 import Carousel from "react-material-ui-carousel";
 import Recap from "../components/Recap";
 import { LineChart } from "@mui/x-charts/LineChart";
 import SectionLabel from "../components/SectionLabel";
-// import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
+import axios from "axios";
+
+export async function loader({ params }) {
+  const today = new Date();
+  const thisMonth = today.getMonth() + 1;
+  const thisYear = today.getFullYear();
+
+  const uid = params?.userId;
+  try {
+    const apiUrls = [
+      `https://saldo-siaga-api.vercel.app/user/${uid}/income/total`,
+      `https://saldo-siaga-api.vercel.app/user/${uid}/expense/total`,
+      `https://saldo-siaga-api.vercel.app/user/${uid}/income/total?year=${thisYear}&month=${thisMonth}`,
+      `https://saldo-siaga-api.vercel.app/user/${uid}/expense/total?year=${thisYear}&month=${thisMonth}`,
+      `https://saldo-siaga-api.vercel.app/user/${uid}/saving/total`,
+      `https://saldo-siaga-api.vercel.app/user/${uid}/debt/total`,
+      `https://saldo-siaga-api.vercel.app/user/${uid}/income/total/all/months`,
+      `https://saldo-siaga-api.vercel.app/user/${uid}/expense/total/all/months`,
+    ];
+
+    const [
+      allIncome,
+      allExpense,
+      income,
+      expense,
+      saving,
+      debt,
+      dataIncomes,
+      dataExpenses,
+    ] = await Promise.all(apiUrls.map((url) => axios.get(url)));
+
+    const totals = allIncome.data.income - allExpense.data.expense;
+    const totalIncomes = income.data.income;
+    const totalExpenses = expense.data.expense;
+    const totalSaving = saving.data.saving;
+    const totalDebt = debt.data.debt;
+    const incomes = dataIncomes.data.monthlyIncomes;
+    const expenses = dataExpenses.data.monthlyExpenses;
+
+    return {
+      totals,
+      totalIncomes,
+      totalExpenses,
+      totalSaving,
+      totalDebt,
+      incomes,
+      expenses,
+    };
+  } catch (error) {
+    console.error(error);
+    return { error };
+  }
+}
 
 export default function Home() {
   const { user } = useRouteLoaderData("root");
+  const {
+    incomes,
+    expenses,
+    totals,
+    totalIncomes,
+    totalExpenses,
+    totalSaving,
+    totalDebt,
+  } = useLoaderData();
 
-  const income = [
-    4000, 3000, 2000, 2780, 1890, 2390, 3490, 4000, 3000, 2000, 2780, 3490,
-  ];
-  const expense = [
-    2400, 1398, 9800, 3908, 4800, 3800, 4300, 2400, 1398, 9800, 3908, 4800,
-  ];
   const xLabels = [
     "Jan",
     "Feb",
@@ -31,6 +86,11 @@ export default function Home() {
     "Des",
   ];
 
+  const dataset = incomes.map((income, index) => ({
+    month: income.month,
+    incomes: income.total,
+    expenses: expenses[index].total,
+  }));
   return (
     <div className="px-4">
       <Box className="my-24 text-center">
@@ -48,10 +108,11 @@ export default function Home() {
             },
           }}
         >
-          <Recap label="Saldo" number="20000" />
-          <Recap label="Pemasukan Bulan Ini" number="2000" />
-          <Recap label="Pengeluaran Bulan Ini" number="100000" />
-          <Recap label="Selisih Saldo" number="5000" />
+          <Recap label="Saldo" number={totals} />
+          <Recap label="Pemasukan Bulan Ini" number={totalIncomes} />
+          <Recap label="Pengeluaran Bulan Ini" number={totalExpenses} />
+          <Recap label="Jumlah Tabungan" number={totalSaving} />
+          <Recap label="Jumlah Pinjaman" number={totalDebt} />
         </Carousel>
       </Box>
       <SectionLabel label="Statistik Keuangan" isCenter />
@@ -59,11 +120,17 @@ export default function Home() {
         <LineChart
           colors={["lightgreen", "darkgreen"]}
           height={300}
+          dataset={dataset}
           series={[
-            { data: income, label: "incomes" },
-            { data: expense, label: "expenses" },
+            { dataKey: "incomes", label: "pemasukan" },
+            { dataKey: "expenses", label: "pengeluaran" },
           ]}
-          xAxis={[{ scaleType: "point", data: xLabels }]}
+          xAxis={[
+            {
+              scaleType: "point",
+              data: xLabels,
+            },
+          ]}
         />
       </Box>
     </div>
