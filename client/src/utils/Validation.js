@@ -65,7 +65,7 @@ export function RepasswordValidation(password, repassword) {
       errorMessage: REQUIRED_FIELD_ERROR,
     };
   } else {
-    return password == repassword
+    return password === repassword
       ? {
           valid: true,
           errorMessage: "",
@@ -87,7 +87,7 @@ export function SignupFormValidation(email, name, password, repassword) {
   return EmailValidation(email).valid &&
     InputValidation(name).valid &&
     PasswordValidation(password).valid &&
-    RepasswordValidation(repassword).valid
+    RepasswordValidation(password, repassword).valid
     ? true
     : false;
 }

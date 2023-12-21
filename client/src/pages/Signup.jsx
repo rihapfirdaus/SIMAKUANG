@@ -35,7 +35,6 @@ export async function action({ request }) {
   const repassword = updates.repassword;
 
   var authStatus;
-  var errorMessage;
 
   try {
     if (SignupFormValidation(email, name, password, repassword)) {
