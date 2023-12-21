@@ -15,7 +15,6 @@ import { useState } from "react";
 import {
   Form,
   Link,
-  redirect,
   useActionData,
   useLoaderData,
   useNavigate,
@@ -151,14 +150,7 @@ export default () => {
     { value: "increase", label: "Tabungan Masuk" },
     { value: "decrease", label: "Tabungan Keluar" },
   ];
-  const categories = [
-    { title: "food" },
-    { title: "drink" },
-    { title: "laundry" },
-    { title: "breakfast" },
-    { title: "lunch" },
-    { title: "dinner" },
-  ];
+  const categories = [];
   useEffect(() => {
     if (Object.entries(status).length > 0) {
       setOpen(true);

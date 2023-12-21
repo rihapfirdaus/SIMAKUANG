@@ -74,14 +74,7 @@ export default ({ action, className }) => {
     { value: "increase", label: "Tabungan Masuk" },
     { value: "decrease", label: "Tabungan Keluar" },
   ];
-  const categories = [
-    { title: "food" },
-    { title: "drink" },
-    { title: "laundry" },
-    { title: "breakfast" },
-    { title: "lunch" },
-    { title: "dinner" },
-  ];
+  const categories = [];
   return (
     <>
       <Form

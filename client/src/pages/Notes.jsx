@@ -487,7 +487,7 @@ export default () => {
               colors={["lightgreen", "darkgreen"]}
               height={300}
               dataset={totalEachMonth}
-              series={[{ dataKey: "total", label: "pemasukan" }]}
+              series={[{ dataKey: "total", label: page }]}
               xAxis={[{ scaleType: "point", data: xLabels }]}
               slotProps={{
                 legend: { hidden: true },
