@@ -7,7 +7,7 @@ import Dashboard, { loader as loaderDashboard } from "./pages/Dashboard.jsx";
 import { Login, action as actionLogin } from "./pages/Login.jsx";
 import Root from "./pages/Root.jsx";
 import Home, { loader as loaderHome } from "./pages/Home.jsx";
-import Statistik from "./pages/Statistik.jsx";
+import Statistik, { loader as loaderStatistik } from "./pages/Statistik.jsx";
 import Profile from "./pages/Profile.jsx";
 import Notes, {
   action as actionNotes,
@@ -18,6 +18,8 @@ import Update, {
   loader as loaderUpdate,
 } from "./pages/Update.jsx";
 import Delete, { action as actionDelete } from "./pages/Delete.jsx";
+import Logout, { action as actionLogout } from "./pages/Logout.jsx";
+import Forgot, { action } from "./pages/Forgot.jsx";
 
 const router = createBrowserRouter([
   {
@@ -55,32 +57,22 @@ const router = createBrowserRouter([
             element: <Delete />,
           },
         ],
-        // },
-        //   {
-        //     path: "/app/:userId/notes/income",
-        //     element: <Income />,
-        //     loader: loaderIncomes,
-        //     action: actionIncomes,
-        //   },
-        //   {
-        //     path: "/app/:userId/notes/saving",
-        //     element: <Saving />,
-        //     loader: loaderSavings,
-        //   },
-        //   {
-        //     path: "/app/:userId/notes/debt",
-        //     element: <Debt />,
-        //     loader: loaderDebts,
-        //   },
-        // ],
       },
       {
         path: "/app/:userId/statistic",
+        loader: loaderStatistik,
         element: <Statistik />,
       },
       {
         path: "/app/:userId/profile",
         element: <Profile />,
+        children: [
+          {
+            path: "/app/:userId/profile/logout",
+            action: actionLogout,
+            element: <Logout />,
+          },
+        ],
       },
     ],
   },
@@ -88,23 +80,17 @@ const router = createBrowserRouter([
     path: "/login",
     action: actionLogin,
     element: <Login />,
-    errorElement: <ErrorPage />,
-
-    // async lazy() {
-    //   let { actionLogin, LoginPage } = await import("./pages/LoginPage.jsx");
-    //   return {
-    //     action: actionLogin,
-    //     Component: LoginPage,
-    //   };
-    // },
   },
   {
     path: "/signup",
     action: actionSignup,
     element: <Signup />,
-    errorElement: <ErrorPage />,
-    // lazy: () => import("./pages/SignupPage.jsx"),
   },
+  // {
+  //   path: "/forgot-password",
+  //   action: action,
+  //   element: <Forgot />,
+  // },
 ]);
 
 export default function App() {

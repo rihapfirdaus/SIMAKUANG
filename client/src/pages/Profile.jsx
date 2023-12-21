@@ -10,7 +10,6 @@ import {
   Avatar,
   Box,
   Button,
-  Link,
   List,
   ListItem,
   ListItemButton,
@@ -18,10 +17,11 @@ import {
   ListItemText,
   Typography,
 } from "@mui/material";
-import { useRouteLoaderData } from "react-router-dom";
+import { Link, Outlet, useParams, useRouteLoaderData } from "react-router-dom";
 
 export default () => {
   const { user } = useRouteLoaderData("root");
+  const { userId } = useParams();
   return (
     <div className="px-4">
       <div className="p-4">
@@ -30,7 +30,7 @@ export default () => {
           <div className="mx-4 text-center m-2">
             <Typography variant="h4">{user.displayName}</Typography>
             <Typography>{user.email}</Typography>
-            <Button>Edit Profil</Button>
+            <Button color="success">Edit Profil</Button>
           </div>
         </div>
       </div>
@@ -68,7 +68,10 @@ export default () => {
       </Box>
       <Box className="my-2">
         <List className="border-2 px-4 rounded-3xl">
-          <ListItemButton>
+          <ListItemButton
+            LinkComponent={Link}
+            to={`/app/${userId}/profile/logout`}
+          >
             <ListItemIcon>{<Logout />}</ListItemIcon>
             <ListItemText
               primary="Keluar"
@@ -80,6 +83,7 @@ export default () => {
       <Typography className="text-center">
         Made by <Link>RihapFirdaus</Link>
       </Typography>
+      <Outlet />
     </div>
   );
 };

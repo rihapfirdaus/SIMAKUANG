@@ -17,9 +17,9 @@ export default () => {
   const [selectedItem, setSelectedItem] = React.useState("home");
 
   React.useEffect(() => {
-    // Update the selected item based on the current pathname
     const pathSegments = location.pathname.split("/");
-    const key = pathSegments[pathSegments.length - 1];
+    const key = pathSegments[3];
+
     setSelectedItem(key || "home");
   }, [location.pathname]);
 
@@ -65,13 +65,24 @@ export default () => {
         anchor="left"
       >
         <Toolbar />
-        <List>
+        <List
+          sx={{
+            "& .Mui-selected .MuiListItemIcon-root, .Mui-selected .MuiListItemText-root, .Mui-selected .MuiListItemText-root":
+              {
+                color: "darkgreen",
+                fontWeight: "bold",
+              },
+          }}
+        >
           {menuItems.map((item) => (
             <ListItemButton
               key={item.key}
               selected={selectedItem === item.key}
               LinkComponent={Link}
-              sx={{ px: 4, py: 2 }}
+              sx={{
+                px: 4,
+                py: 2,
+              }}
               to={item.to}
             >
               <ListItemIcon>{item.icon}</ListItemIcon>

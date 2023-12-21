@@ -48,7 +48,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Close";
-import { display } from "@mui/system";
+import { color, display } from "@mui/system";
 
 export async function loader({ params }) {
   const today = new Date();
@@ -356,9 +356,15 @@ export default () => {
           />
         </GridToolbarContainer>
         <GridToolbarContainer
-          sx={{ display: "flex", justifyContent: "space-between", mx: 1 }}
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            mx: 1,
+          }}
         >
-          <Button onClick={handleOpen}>Filter</Button>
+          <Button onClick={handleOpen} color="success">
+            Filter
+          </Button>
 
           <GridToolbarQuickFilter />
         </GridToolbarContainer>
@@ -369,10 +375,14 @@ export default () => {
   const customFooter = () => {
     return (
       <GridFooterContainer sx={{ mx: 1 }}>
-        <GridToolbarExport />
+        <GridToolbarExport style={{ color: "darkgreen" }} />
         <GridPagination />
       </GridFooterContainer>
     );
+  };
+
+  const customProgress = () => {
+    return <LinearProgress color="success" />;
   };
   const xxl = useMediaQuery(useTheme().breakpoints.up("xl"));
   const xl = useMediaQuery(useTheme().breakpoints.up("lg"));
@@ -505,7 +515,7 @@ export default () => {
           slots={{
             toolbar: customToolbar,
             footer: customFooter,
-            loadingOverlay: LinearProgress,
+            loadingOverlay: customProgress,
           }}
           loading={loading}
           disableDensitySelector

@@ -165,7 +165,6 @@ export default () => {
       setSpinner(false);
 
       setTimeout(() => {
-        console.log("harusnya", data);
         navigate(`/app/${userId}/notes/${type}`);
       }, 1500);
     }

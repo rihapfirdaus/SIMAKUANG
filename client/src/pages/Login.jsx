@@ -1,6 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { LoginFormValidation } from "../utils/Validation";
-import { Link, Form, useActionData, redirect } from "react-router-dom";
+import {
+  Link,
+  Form,
+  useActionData,
+  redirect,
+  useNavigate,
+} from "react-router-dom";
 
 import { Alert, Stack, Button, Box, CircularProgress } from "@mui/material";
 import { INVALID_ACCOUNT_ERROR, INVALID_FORM_ERROR } from "../utils/Strings";
@@ -18,8 +24,6 @@ export async function action({ request }) {
   const email = updates.email;
   const password = updates.password;
 
-  var errorMessage;
-
   try {
     if (LoginFormValidation(email, password)) {
       const response = await axios.get(
@@ -31,32 +35,55 @@ export async function action({ request }) {
 
       await signInWithEmailAndPassword(auth, email, password);
 
-      console.log(user, userId);
-      return redirect(`/app/${userId}/home`);
+      return { status: "200", message: "Login Berhasil", userId };
     } else {
-      errorMessage = INVALID_FORM_ERROR;
+      return { status: "404", message: INVALID_FORM_ERROR };
     }
   } catch (error) {
-    errorMessage = INVALID_ACCOUNT_ERROR;
+    console.log(error);
+    return { status: "404", message: INVALID_ACCOUNT_ERROR, error };
   }
-
-  return { error: errorMessage };
 }
 
 export function Login() {
-  const errors = useActionData();
+  const status = useActionData() || "";
+  const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  const [show, setShow] = useState(false);
   const [spinner, setSpinner] = useState(false);
+
+  useEffect(() => {
+    if (Object.entries(status).length > 0) {
+      setShow(true);
+      setSpinner(false);
+    }
+
+    if (status.status === "200") {
+      setTimeout(() => {
+        navigate(`/app/${status.userId}/home`);
+      }, 1500);
+    }
+  }, [status]);
+  useEffect(() => {
+    if (Object.entries(status).length > 0) {
+      setShow(false);
+    }
+  }, [email, password]);
 
   return (
     <Box className="grid place-items-center h-screen w-screen py-12">
       <Stack className="w-96">
         <AppsIcon isCenter={true} />
         <p className="mt-4 py-4">Masuk dengan akun Anda</p>
-        <Form method="post">
+        <Form
+          method="post"
+          onSubmit={() => {
+            setSpinner(true);
+          }}
+        >
           <Stack spacing={1.5}>
             <Stack spacing={0.25}>
               <EmailField value={email} setValue={setEmail} />
@@ -67,7 +94,10 @@ export function Login() {
                 setValue={setPassword}
               />
             </Stack>
-            <Link className="text-green-900 hover:underline text-end">
+            <Link
+              className="text-green-900 hover:underline text-end"
+              // to={`/forgot-password`}
+            >
               lupa password?
             </Link>
             <Button
@@ -84,14 +114,14 @@ export function Login() {
               )}
             </Button>
             <Alert
-              severity="error"
+              severity={status?.status === "200" ? "success" : "error"}
               sx={{
-                visibility: errors ? "visible" : "hidden",
+                visibility: show ? "visible" : "hidden",
                 display: "flex",
                 justifyContent: "center",
               }}
             >
-              {errors?.error}
+              {status?.message}
             </Alert>
           </Stack>
         </Form>

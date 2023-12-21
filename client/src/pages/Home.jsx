@@ -115,8 +115,8 @@ export default function Home() {
           <Recap label="Jumlah Pinjaman" number={totalDebt} />
         </Carousel>
       </Box>
-      <SectionLabel label="Statistik Keuangan" isCenter />
-      <Box className="border-2 p-2 rounded-3xl">
+      <Box className="border-2 p-2 rounded-3xl mt-2">
+        <SectionLabel label="Statistik Keuangan" isCenter />
         <LineChart
           colors={["lightgreen", "darkgreen"]}
           height={300}
