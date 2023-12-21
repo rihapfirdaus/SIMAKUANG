@@ -265,9 +265,9 @@ const Statistics = ({
   };
   return (
     <>
-      <Recap label={labelrecap1} className="my-0" number={recap1} />
-      <Recap label={labelrecap2} className="my-0" number={recap2} />
-      <Box className="flex flex-col justify-center items-center border-2 p-4 rounded-3xl mb-2">
+      <Recap label={labelrecap1} number={recap1} />
+      <Recap label={labelrecap2} number={recap2} />
+      <Box className="flex flex-col justify-center items-center border-2 p-4 rounded-3xl ">
         <SectionLabel label={`Kategori ${label}`} isCenter />
         {pie.length !== 0 ? (
           <PieChart

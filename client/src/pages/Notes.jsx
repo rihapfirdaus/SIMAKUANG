@@ -1,13 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  Form,
-  Link,
-  Outlet,
-  redirect,
-  useLoaderData,
-  useLocation,
-  useParams,
-} from "react-router-dom";
+import { Link, Outlet, useLoaderData, useParams } from "react-router-dom";
 import {
   Box,
   Button,
@@ -27,12 +19,10 @@ import {
   DataGrid,
   GridFooterContainer,
   GridPagination,
-  GridRowModes,
   GridToolbarContainer,
   GridToolbarExport,
   GridToolbarQuickFilter,
   GridActionsCellItem,
-  GridRowEditStopReasons,
 } from "@mui/x-data-grid";
 import axios from "axios";
 import { LineChart } from "@mui/x-charts";
@@ -46,9 +36,6 @@ import DateField from "../components/DateField";
 import SectionLabel from "../components/SectionLabel";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
-import SaveIcon from "@mui/icons-material/Save";
-import CancelIcon from "@mui/icons-material/Close";
-import { color, display } from "@mui/system";
 
 export async function loader({ params }) {
   const today = new Date();
@@ -170,6 +157,16 @@ export async function action({ request, params }) {
   }
 }
 
+const formatType = (types) => {
+  return types === "expense"
+    ? "Pengeluaran"
+    : types === "income"
+    ? "Pemasukan"
+    : types === "debt"
+    ? "Pinjaman"
+    : "Tabungan";
+};
+
 export default () => {
   const { userId, type } = useParams();
   const { notes, total, totalByMonth, totalEachMonth } = useLoaderData();
@@ -179,6 +176,7 @@ export default () => {
   const [rows, setRows] = React.useState([]);
   const [alert, setAlert] = React.useState("");
   const [show, setShow] = React.useState(false);
+  const [page, setPage] = useState(formatType(type));
 
   const [data, setData] = React.useState({
     month: new Date().getMonth(),
@@ -238,6 +236,10 @@ export default () => {
     };
     getExpenses();
   }, [data, notes]);
+
+  useEffect(() => {
+    setPage(formatType(type));
+  }, [type]);
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -466,7 +468,11 @@ export default () => {
       <Box className="lg:grid lg:grid-cols-3">
         <FormRecord className="lg:col-span-2 mt-4 lg:mr-4" />
         <Box className="hidden lg:block">
-          <Recap label="Pemasukan Bulan Ini" number={totalByMonth} />
+          <Recap
+            label={`${page} Bulan Ini`}
+            className="my-4"
+            number={totalByMonth}
+          />
           <Box className="flex flex-col justify-center items-center border-2 p-4 rounded-3xl">
             <Typography
               sx={{
@@ -537,16 +543,20 @@ export default () => {
         aria-describedby="modal-modal-description"
       >
         <Box
+          className="border-2 p-4 rounded-3xl"
           sx={{
             position: "absolute",
             top: "50%",
             left: "50%",
             transform: "translate(-50%, -50%)",
-            width: 500,
-            bgcolor: "background.paper",
-            border: "2px solid #000",
             boxShadow: 24,
-            p: 4,
+            bgcolor: "white",
+            width: 350,
+            p: lg ? 4 : 2,
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignContent: "center",
           }}
         >
           <Stack spacing={1}>
@@ -573,8 +583,29 @@ export default () => {
               </Stack>
             )}
           </Stack>
-          <Button onClick={handleSubmit}>Simpan</Button>
-          <Button onClick={handleClose}>Batal</Button>
+          <Stack
+            direction="row"
+            spacing={2}
+            justifyContent={"end"}
+            sx={{ pt: 2 }}
+          >
+            <Button
+              onClick={handleClose}
+              color="error"
+              variant="outlined"
+              sx={{ px: 2 }}
+            >
+              Batal
+            </Button>
+            <Button
+              onClick={handleSubmit}
+              color="success"
+              variant="outlined"
+              sx={{ px: 2 }}
+            >
+              Simpan
+            </Button>
+          </Stack>
         </Box>
       </Modal>
       <Outlet></Outlet>

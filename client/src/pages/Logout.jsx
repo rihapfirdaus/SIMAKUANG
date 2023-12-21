@@ -78,7 +78,7 @@ export default () => {
           onSubmit={() => {
             setSpinner(true);
           }}
-          className="`border-2 p-4 rounded-3xl"
+          className="border-2 p-4 rounded-3xl"
           sx={{
             position: "absolute",
             top: "50%",

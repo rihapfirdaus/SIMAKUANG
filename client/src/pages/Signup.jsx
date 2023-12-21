@@ -13,6 +13,7 @@ import {
   Checkbox,
   Box,
   Alert,
+  CircularProgress,
 } from "@mui/material";
 import {
   EMAIL_IN_USE_ERROR,

@@ -19,7 +19,6 @@ import Update, {
 } from "./pages/Update.jsx";
 import Delete, { action as actionDelete } from "./pages/Delete.jsx";
 import Logout, { action as actionLogout } from "./pages/Logout.jsx";
-import Forgot, { action } from "./pages/Forgot.jsx";
 
 const router = createBrowserRouter([
   {
@@ -86,11 +85,6 @@ const router = createBrowserRouter([
     action: actionSignup,
     element: <Signup />,
   },
-  // {
-  //   path: "/forgot-password",
-  //   action: action,
-  //   element: <Forgot />,
-  // },
 ]);
 
 export default function App() {

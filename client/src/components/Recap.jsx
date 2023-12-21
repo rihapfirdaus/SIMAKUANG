@@ -9,7 +9,7 @@ export default ({ label, number, className }) => {
     compactDisplay: "short",
   });
   return (
-    <div className={`my-4 ${className} border-2 rounded-3xl p-4`}>
+    <div className={` ${className} border-2 rounded-3xl p-4`}>
       <Typography
         sx={{
           fontWeight: "bold",
