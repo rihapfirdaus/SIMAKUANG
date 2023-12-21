@@ -17,4 +17,8 @@ router.get(
   "/user/:userId/expense/total/all/months",
   expenseController.getMonthlyExpensesByYear
 );
+router.get(
+  "/user/:userId/expense/category",
+  expenseController.getExpenseByCategory
+);
 module.exports = router;

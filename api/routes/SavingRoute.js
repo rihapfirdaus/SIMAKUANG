@@ -14,4 +14,8 @@ router.get(
   "/user/:userId/saving/total/all/months",
   savingController.getMonthlySavingsByYear
 );
+router.get(
+  "/user/:userId/saving/category",
+  savingController.getSavingByCategory
+);
 module.exports = router;

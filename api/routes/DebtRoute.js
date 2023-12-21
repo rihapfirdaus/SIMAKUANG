@@ -14,4 +14,5 @@ router.get(
   "/user/:userId/debt/total/all/months",
   debtController.getMonthlyDebtsByYear
 );
+router.get("/user/:userId/debt/category", debtController.getDebtByCategory);
 module.exports = router;

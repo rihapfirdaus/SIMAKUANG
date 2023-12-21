@@ -210,6 +210,57 @@ const getMonthlySavingsByYear = async (req, res) => {
   }
 };
 
+// Get total data dan jumlah berdasarkan kategori
+const getSavingByCategory = async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const { year, month, startDate, endDate } = req.query;
+
+    let query = { userId };
+
+    if (year && month) {
+      query.date = {
+        $gte: new Date(year, month - 1, 1),
+        $lt: new Date(year, month, 1),
+      };
+    } else if (year) {
+      query.date = {
+        $gte: new Date(year, 0, 1),
+        $lt: new Date(`${parseInt(year) + 1}-01-01`),
+      };
+    } else if (month) {
+      const currentYear = new Date().getFullYear();
+      query.date = {
+        $gte: new Date(currentYear, month - 1, 1),
+        $lt: new Date(currentYear, month, 1),
+      };
+    } else if (startDate && endDate) {
+      query.date = { $gte: new Date(startDate), $lt: new Date(endDate) };
+    }
+
+    const savings = await Saving.find(query);
+
+    const result = savings.reduce((acc, saving) => {
+      const { category, amount } = saving;
+      acc[category] = acc[category] || { totalAmount: 0, count: 0 };
+      acc[category].totalAmount += amount;
+      acc[category].count += 1;
+      return acc;
+    }, {});
+
+    const aggregatedResult = Object.entries(result).map(([category, data]) => ({
+      _id: category,
+      totalAmount: data.totalAmount,
+      count: data.count,
+    }));
+
+    res.status(200).json(aggregatedResult);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
 module.exports = {
   createSaving,
   updateSaving,
@@ -218,4 +269,5 @@ module.exports = {
   getSavingsByUser,
   getTotalSavingByUser,
   getMonthlySavingsByYear,
+  getSavingByCategory,
 };

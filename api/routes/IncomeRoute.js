@@ -14,4 +14,8 @@ router.get(
   "/user/:userId/income/total/all/months",
   incomeController.getMonthlyIncomesByYear
 );
+router.get(
+  "/user/:userId/income/category",
+  incomeController.getIncomeByCategory
+);
 module.exports = router;
