@@ -36,11 +36,6 @@ export default ({ label, name, value, setValue, isDateline, year, month }) => {
             : month
             ? setValue(date.month())
             : setValue(date.toDate());
-
-          console.log(
-            "ini dari datefield",
-            year ? date.year() : month ? date.month() : date.toDate()
-          );
         }}
         sx={{
           width: "100%",

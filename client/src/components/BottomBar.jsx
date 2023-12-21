@@ -11,14 +11,12 @@ export default () => {
   const [value, setValue] = React.useState(0);
 
   React.useEffect(() => {
-    // Update the selected value based on the current pathname
     const pathSegments = location.pathname.split("/");
     const key =
       pathSegments[pathSegments.length - 2] === "notes"
         ? pathSegments[pathSegments.length - 2]
         : pathSegments[pathSegments.length - 1];
-    console.log(key);
-    // Map the key to the index of BottomNavigationAction
+
     const indexMap = {
       home: 0,
       notes: 1,

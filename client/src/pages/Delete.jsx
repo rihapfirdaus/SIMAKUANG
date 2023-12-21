@@ -37,7 +37,6 @@ export async function action({ params }) {
     await axios.delete(apiUrl);
     return { status: "201", message: "Data berhasil dihapus" };
   } catch (error) {
-    console.log(error);
     return {
       status: "404",
       message: "Data gagal dihapus, Silahkan coba lagi.",
@@ -61,7 +60,6 @@ export default () => {
       setSpinner(false);
 
       setTimeout(() => {
-        console.log("harusnya", data);
         navigate(`/app/${userId}/notes/${type}`);
       }, 1500);
     }

@@ -90,6 +90,7 @@ export function Signup() {
 
     if (status.status === "200") {
       setTimeout(() => {
+        setShow(false);
         navigate(`/app/${status.userId}/home`);
       }, 1500);
     }

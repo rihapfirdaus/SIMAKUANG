@@ -85,7 +85,6 @@ export async function loader({ params }) {
         total = totalNote.data.saving;
         totalByMonth = totalNoteByMonth.data.saving;
         totalEachMonth = totalNoteEachMonth.data.monthlySavings;
-        console.log(totalNoteEachMonth.data.monthlySavings);
         break;
     }
 

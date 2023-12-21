@@ -31,7 +31,6 @@ export async function action({ request }) {
     const user = response.data;
     return { status: "200", message: "Login Berhasil", userId };
   } catch (error) {
-    console.log(error);
     return { status: "404", message: INVALID_ACCOUNT_ERROR, error };
   }
 }

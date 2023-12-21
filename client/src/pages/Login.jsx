@@ -1,12 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { LoginFormValidation } from "../utils/Validation";
-import {
-  Link,
-  Form,
-  useActionData,
-  redirect,
-  useNavigate,
-} from "react-router-dom";
+import { Link, Form, useActionData, useNavigate } from "react-router-dom";
 
 import { Alert, Stack, Button, Box, CircularProgress } from "@mui/material";
 import { INVALID_ACCOUNT_ERROR, INVALID_FORM_ERROR } from "../utils/Strings";
@@ -63,6 +57,7 @@ export function Login() {
 
     if (status.status === "200") {
       setTimeout(() => {
+        setShow(false);
         navigate(`/app/${status.userId}/home`);
       }, 1500);
     }
