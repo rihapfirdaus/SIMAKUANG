@@ -7,12 +7,11 @@ import BottomBar from "../components/BottomBar";
 import { Box, useTheme } from "@mui/system";
 
 export async function loader({ params }) {
+  const baseUrl = import.meta.env.VITE_REACT_APP_SERVER_BASE_URL;
   const uid = params?.userId;
 
   try {
-    const response = await axios.get(
-      `https://saldo-siaga-api.vercel.app/user/id/${uid}`
-    );
+    const response = await axios.get(`${baseUrl}/user/id/${uid}`);
     const user = response.data;
 
     return { user };

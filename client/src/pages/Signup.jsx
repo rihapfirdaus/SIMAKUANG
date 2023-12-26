@@ -26,6 +26,7 @@ import PasswordField from "../components/PasswordField";
 import TextFieldWithValidation from "../components/TextFieldWithValidation";
 
 export async function action({ request }) {
+  const baseUrl = import.meta.env.VITE_REACT_APP_SERVER_BASE_URL;
   const formData = await request.formData();
   const updates = Object.fromEntries(formData);
 
@@ -45,7 +46,7 @@ export async function action({ request }) {
       );
 
       const userId = userCredential.user.uid;
-      const apiUrl = "https://saldo-siaga-api.vercel.app/user";
+      const apiUrl = `${baseUrl}/user`;
       const requestBody = {
         uid: userId,
         email: email,

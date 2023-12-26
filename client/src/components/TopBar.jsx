@@ -4,9 +4,10 @@ import Toolbar from "@mui/material/Toolbar";
 import Container from "@mui/material/Container";
 import Avatar from "@mui/material/Avatar";
 import AppsIcon from "../utils/AppsIcon";
-import { useLocation } from "react-router-dom";
+import { useLocation, useRouteLoaderData } from "react-router-dom";
 
 export default () => {
+  const { user } = useRouteLoaderData("root");
   const location = useLocation();
   const [page, setPage] = React.useState("home");
 
@@ -21,7 +22,10 @@ export default () => {
       <Container maxWidth="2xl">
         <Toolbar disableGutters>
           <AppsIcon />
-          <Avatar sx={{ display: page === "profile" ? "none" : "" }} />
+          <Avatar
+            src={user.photoURL}
+            sx={{ display: page === "profile" ? "none" : "" }}
+          />
         </Toolbar>
       </Container>
     </AppBar>

@@ -9,12 +9,12 @@ import Typography from "@mui/material/Typography";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { BarChart } from "@mui/x-charts/BarChart";
 import { axisClasses } from "@mui/x-charts";
-import { LineChart } from "@mui/x-charts";
 import Recap from "../components/Recap";
 import { useLoaderData } from "react-router-dom";
 import axios from "axios";
 
 export async function loader({ params }) {
+  const baseUrl = import.meta.env.VITE_REACT_APP_SERVER_BASE_URL;
   const today = new Date();
   const thisMonth = today.getMonth() + 1;
   const thisYear = today.getFullYear();
@@ -23,22 +23,22 @@ export async function loader({ params }) {
 
   try {
     const apiUrls = [
-      `https://saldo-siaga-api.vercel.app/user/${uid}/expense/total?year=${thisYear}`,
-      `https://saldo-siaga-api.vercel.app/user/${uid}/expense/total?year=${thisYear}&month=${thisMonth}`,
-      `https://saldo-siaga-api.vercel.app/user/${uid}/expense/category?year=${thisYear}&month=${thisMonth}`,
-      `https://saldo-siaga-api.vercel.app/user/${uid}/expense/total/all/months`,
-      `https://saldo-siaga-api.vercel.app/user/${uid}/income/total?year=${thisYear}`,
-      `https://saldo-siaga-api.vercel.app/user/${uid}/income/total?year=${thisYear}&month=${thisMonth}`,
-      `https://saldo-siaga-api.vercel.app/user/${uid}/income/category?year=${thisYear}&month=${thisMonth}`,
-      `https://saldo-siaga-api.vercel.app/user/${uid}/income/total/all/months`,
-      `https://saldo-siaga-api.vercel.app/user/${uid}/debt/total?year=${thisYear}`,
-      `https://saldo-siaga-api.vercel.app/user/${uid}/debt/total?year=${thisYear}&month=${thisMonth}`,
-      `https://saldo-siaga-api.vercel.app/user/${uid}/debt/category?year=${thisYear}&month=${thisMonth}`,
-      `https://saldo-siaga-api.vercel.app/user/${uid}/debt/total/all/months`,
-      `https://saldo-siaga-api.vercel.app/user/${uid}/saving/total?year=${thisYear}`,
-      `https://saldo-siaga-api.vercel.app/user/${uid}/saving/total?year=${thisYear}&month=${thisMonth}`,
-      `https://saldo-siaga-api.vercel.app/user/${uid}/saving/category?year=${thisYear}&month=${thisMonth}`,
-      `https://saldo-siaga-api.vercel.app/user/${uid}/saving/total/all/months`,
+      `${baseUrl}/user/${uid}/expense/total?year=${thisYear}`,
+      `${baseUrl}/user/${uid}/expense/total?year=${thisYear}&month=${thisMonth}`,
+      `${baseUrl}/user/${uid}/expense/category?year=${thisYear}&month=${thisMonth}`,
+      `${baseUrl}/user/${uid}/expense/total/all/months`,
+      `${baseUrl}/user/${uid}/income/total?year=${thisYear}`,
+      `${baseUrl}/user/${uid}/income/total?year=${thisYear}&month=${thisMonth}`,
+      `${baseUrl}/user/${uid}/income/category?year=${thisYear}&month=${thisMonth}`,
+      `${baseUrl}/user/${uid}/income/total/all/months`,
+      `${baseUrl}/user/${uid}/debt/total?year=${thisYear}`,
+      `${baseUrl}/user/${uid}/debt/total?year=${thisYear}&month=${thisMonth}`,
+      `${baseUrl}/user/${uid}/debt/category?year=${thisYear}&month=${thisMonth}`,
+      `${baseUrl}/user/${uid}/debt/total/all/months`,
+      `${baseUrl}/user/${uid}/saving/total?year=${thisYear}`,
+      `${baseUrl}/user/${uid}/saving/total?year=${thisYear}&month=${thisMonth}`,
+      `${baseUrl}/user/${uid}/saving/category?year=${thisYear}&month=${thisMonth}`,
+      `${baseUrl}/user/${uid}/saving/total/all/months`,
     ];
 
     const [

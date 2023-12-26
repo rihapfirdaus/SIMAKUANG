@@ -14,7 +14,7 @@ export default function ErrorPage() {
         height: "100vh",
       }}
     >
-      <img src="error.jpg" style={{ width: "25%" }} alt="" />
+      <img src="/error.jpg" style={{ width: "25%" }} alt="" />
     </div>
   );
 }

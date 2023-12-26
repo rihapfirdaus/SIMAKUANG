@@ -31,14 +31,13 @@ import axios from "axios";
 import moment from "moment";
 
 export async function loader({ params }) {
+  const baseUrl = import.meta.env.VITE_REACT_APP_SERVER_BASE_URL;
   const uid = params?.userId;
   const id = params?.id;
   const type = params?.type;
 
   try {
-    const response = await axios.get(
-      `https://saldo-siaga-api.vercel.app/user/${uid}/${type}/id/${id}`
-    );
+    const response = await axios.get(`${baseUrl}/user/${uid}/${type}/id/${id}`);
 
     let data;
     switch (type) {
@@ -57,11 +56,11 @@ export async function loader({ params }) {
     }
     return data;
   } catch (error) {
-    console.error("Error fetching user data:", error);
     return { error };
   }
 }
 export async function action({ request, params }) {
+  const baseUrl = import.meta.env.VITE_REACT_APP_SERVER_BASE_URL;
   const uid = params?.userId;
   const id = params?.id;
   const type = params?.type;
@@ -106,11 +105,10 @@ export async function action({ request, params }) {
         note,
       };
     }
-    const apiUrl = `https://saldo-siaga-api.vercel.app/user/${uid}/${type}/${id}`;
+    const apiUrl = `${baseUrl}/user/${uid}/${type}/${id}`;
     await axios.put(apiUrl, requestBody);
     return { status: "201", message: "Data berhasil diubah" };
   } catch (error) {
-    console.log(error);
     return {
       status: "404",
       message: "Data gagal diubah, Silahkan coba lagi.",
@@ -140,17 +138,13 @@ export default () => {
 
   const [date, setDate] = useState(new Date());
   const [dateline, setDateline] = useState(new Date());
+  const [savingType, setSavingType] = useState(data.category || "");
   const [amount, setAmount] = useState(data.amount || "");
   const [debtor, setDebtor] = useState(data.debtor || "");
   const [creditor, setCreditor] = useState(data.creditor || "");
   const [notes, setNotes] = useState(data.notes || "");
   const [category, setCategory] = useState(data.category || "");
 
-  const optionSavings = [
-    { value: "increase", label: "Tabungan Masuk" },
-    { value: "decrease", label: "Tabungan Keluar" },
-  ];
-  const categories = [];
   useEffect(() => {
     if (Object.entries(status).length > 0) {
       setOpen(true);
@@ -165,6 +159,7 @@ export default () => {
   useEffect(() => {
     setPage(formatType(type));
   }, [type]);
+
   const handleClose = (event, reason) => {
     if (reason === "clickaway") {
       return;
@@ -268,7 +263,10 @@ export default () => {
                   label={`Tipe ${page}`}
                   value={savingType}
                   setValue={setSavingType}
-                  options={optionSavings}
+                  options={[
+                    { value: "increase", label: "Tabungan Masuk" },
+                    { value: "decrease", label: "Tabungan Keluar" },
+                  ]}
                   required
                 />
               ) : (
@@ -277,7 +275,7 @@ export default () => {
                   label={`Tipe ${page}`}
                   value={category}
                   setValue={setCategory}
-                  options={categories}
+                  options={[]}
                 />
               )}
             </FormControl>

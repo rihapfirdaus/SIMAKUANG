@@ -1,5 +1,4 @@
 import { Box } from "@mui/material";
-import AppsIcon from "../utils/AppsIcon";
 import { Link } from "react-router-dom";
 import Carousel from "react-material-ui-carousel";
 

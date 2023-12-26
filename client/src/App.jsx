@@ -4,6 +4,7 @@ import {
   Navigate,
   RouterProvider,
   createBrowserRouter,
+  useSearchParams,
 } from "react-router-dom";
 import { Signup, action as actionSignup } from "./pages/Signup.jsx";
 import ErrorPage from "./pages/ErrorPage.jsx";
@@ -12,7 +13,10 @@ import { Login, action as actionLogin } from "./pages/Login.jsx";
 import Root from "./pages/Root.jsx";
 import Home, { loader as loaderHome } from "./pages/Home.jsx";
 import Statistik, { loader as loaderStatistik } from "./pages/Statistik.jsx";
-import Profile from "./pages/Profile.jsx";
+import Profile, {
+  action as actionProfil,
+  loader as loaderProfil,
+} from "./pages/Profile.jsx";
 import Notes, {
   action as actionNotes,
   loader as loaderNotes,
@@ -72,6 +76,8 @@ export default function App() {
             },
             {
               path: "/app/:userId/profile",
+              loader: loaderProfil,
+              action: actionProfil,
               element: <Profile />,
               children: [
                 {

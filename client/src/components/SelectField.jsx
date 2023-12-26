@@ -8,6 +8,7 @@ import {
 } from "@mui/material";
 
 export default ({
+  name,
   label,
   value,
   defaultValue,
@@ -21,6 +22,7 @@ export default ({
     <>
       <InputLabel color="success">{label}</InputLabel>
       <Select
+        name={name}
         size={breakpoint ? "medium" : "small"}
         label={label}
         value={value}

@@ -1,23 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { LoginFormValidation } from "../utils/Validation";
-import {
-  Link,
-  Form,
-  useActionData,
-  redirect,
-  useNavigate,
-} from "react-router-dom";
+import { Link, Form, useActionData, useNavigate } from "react-router-dom";
 
 import { Alert, Stack, Button, Box, CircularProgress } from "@mui/material";
-import { INVALID_ACCOUNT_ERROR, INVALID_FORM_ERROR } from "../utils/Strings";
+import { INVALID_ACCOUNT_ERROR } from "../utils/Strings";
 import axios from "axios";
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../services/firebase";
 import AppsIcon from "../utils/AppsIcon";
 import EmailField from "../components/EmailField";
-import PasswordField from "../components/PasswordField";
 
 export async function action({ request }) {
+  const baseUrl = import.meta.env.VITE_REACT_APP_SERVER_BASE_URL;
   const formData = await request.formData();
   const updates = Object.fromEntries(formData);
 
@@ -25,9 +16,7 @@ export async function action({ request }) {
   const password = updates.password;
 
   try {
-    const response = await axios.get(
-      `https://saldo-siaga-api.vercel.app/user/${email}`
-    );
+    const response = await axios.get(`${baseUrl}/user/${email}`);
     const user = response.data;
     return { status: "200", message: "Login Berhasil", userId };
   } catch (error) {

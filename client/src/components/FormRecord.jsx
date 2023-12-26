@@ -70,11 +70,6 @@ export default ({ action, className }) => {
     setOpen(false);
   };
 
-  const optionSavings = [
-    { value: "increase", label: "Tabungan Masuk" },
-    { value: "decrease", label: "Tabungan Keluar" },
-  ];
-  const categories = [];
   return (
     <>
       <Form
@@ -156,7 +151,10 @@ export default ({ action, className }) => {
                 label={`Tipe ${page}`}
                 value={savingType}
                 setValue={setSavingType}
-                options={optionSavings}
+                options={[
+                  { value: "increase", label: "Tabungan Masuk" },
+                  { value: "decrease", label: "Tabungan Keluar" },
+                ]}
               />
             ) : (
               <TextSelectField
@@ -164,7 +162,7 @@ export default ({ action, className }) => {
                 label={`Tipe ${page}`}
                 value={category}
                 setValue={setCategory}
-                options={categories}
+                options={[]}
               />
             )}
           </FormControl>

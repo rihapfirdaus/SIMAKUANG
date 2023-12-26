@@ -38,6 +38,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 
 export async function loader({ params }) {
+  const baseUrl = import.meta.env.VITE_REACT_APP_SERVER_BASE_URL;
   const today = new Date();
   const thisMonth = today.getMonth() + 1;
   const thisYear = today.getFullYear();
@@ -47,10 +48,10 @@ export async function loader({ params }) {
 
   try {
     const apiUrls = [
-      `https://saldo-siaga-api.vercel.app/user/${uid}/${type}`,
-      `https://saldo-siaga-api.vercel.app/user/${uid}/${type}/total`,
-      `https://saldo-siaga-api.vercel.app/user/${uid}/${type}/total?year=${thisYear}&month=${thisMonth}`,
-      `https://saldo-siaga-api.vercel.app/user/${uid}/${type}/total/all/months`,
+      `${baseUrl}/user/${uid}/${type}`,
+      `${baseUrl}/user/${uid}/${type}/total`,
+      `${baseUrl}/user/${uid}/${type}/total?year=${thisYear}&month=${thisMonth}`,
+      `${baseUrl}/user/${uid}/${type}/total/all/months`,
     ];
 
     const [allNote, totalNote, totalNoteByMonth, totalNoteEachMonth] =
@@ -101,6 +102,7 @@ export async function loader({ params }) {
 }
 
 export async function action({ request, params }) {
+  const baseUrl = import.meta.env.VITE_REACT_APP_SERVER_BASE_URL;
   const uid = params?.userId;
   const type = params?.type;
 
@@ -127,11 +129,11 @@ export async function action({ request, params }) {
         debtor,
         creditor,
         amount,
-        category,
         date,
         dueDate,
         note,
       };
+      console.log(requestBody);
     } else {
       const category = updates.category;
       const date =
@@ -144,10 +146,11 @@ export async function action({ request, params }) {
         note,
       };
     }
-    const apiUrl = `https://saldo-siaga-api.vercel.app/user/${uid}/${type}`;
+    const apiUrl = `http://localhost:5000/user/${uid}/${type}`;
     await axios.post(apiUrl, requestBody);
     return { status: "201", message: "Data berhasil ditambahkan" };
   } catch (error) {
+    console.log(error);
     return {
       status: "404",
       message: "Data gagal ditambahkan, Silahkan coba lagi.",
@@ -193,22 +196,23 @@ export default () => {
     setLoading(true);
     const getExpenses = async () => {
       try {
+        const baseUrl = import.meta.env.VITE_REACT_APP_SERVER_BASE_URL;
         let apiUrl;
 
         switch (option) {
           case "month":
-            apiUrl = `https://saldo-siaga-api.vercel.app/user/${userId}/${type}?year=${
+            apiUrl = `${baseUrl}/user/${userId}/${type}?year=${
               data.year
             }&month=${data.month + 1}`;
             break;
           case "year":
-            apiUrl = `https://saldo-siaga-api.vercel.app/user/${userId}/${type}?year=${data.year}`;
+            apiUrl = `${baseUrl}/user/${userId}/${type}?year=${data.year}`;
             break;
           case "period":
-            apiUrl = `https://saldo-siaga-api.vercel.app/user/${userId}/${type}?startDate=${data.startDate}&endDate=${data.endDate}`;
+            apiUrl = `${baseUrl}/user/${userId}/${type}?startDate=${data.startDate}&endDate=${data.endDate}`;
             break;
           default:
-            apiUrl = `https://saldo-siaga-api.vercel.app/user/${userId}/${type}`;
+            apiUrl = `${baseUrl}/user/${userId}/${type}`;
             break;
         }
 
@@ -376,7 +380,10 @@ export default () => {
   const customFooter = () => {
     return (
       <GridFooterContainer sx={{ mx: 1 }}>
-        <GridToolbarExport style={{ color: "darkgreen" }} />
+        <GridToolbarExport
+          style={{ color: "darkgreen" }}
+          printOptions={{ disableToolbarButton: true }}
+        />
         <GridPagination />
       </GridFooterContainer>
     );

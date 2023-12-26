@@ -1,6 +1,6 @@
 import React from "react";
 import { useLoaderData, useRouteLoaderData } from "react-router-dom";
-import { Box, Typography, useMediaQuery } from "@mui/material";
+import { Box, Typography, useMediaQuery, useTheme } from "@mui/material";
 import Carousel from "react-material-ui-carousel";
 import Recap from "../components/Recap";
 import { LineChart } from "@mui/x-charts/LineChart";
@@ -14,15 +14,16 @@ export async function loader({ params }) {
 
   const uid = params?.userId;
   try {
+    const baseUrl = import.meta.env.VITE_REACT_APP_SERVER_BASE_URL;
     const apiUrls = [
-      `https://saldo-siaga-api.vercel.app/user/${uid}/income/total`,
-      `https://saldo-siaga-api.vercel.app/user/${uid}/expense/total`,
-      `https://saldo-siaga-api.vercel.app/user/${uid}/income/total?year=${thisYear}&month=${thisMonth}`,
-      `https://saldo-siaga-api.vercel.app/user/${uid}/expense/total?year=${thisYear}&month=${thisMonth}`,
-      `https://saldo-siaga-api.vercel.app/user/${uid}/saving/total`,
-      `https://saldo-siaga-api.vercel.app/user/${uid}/debt/total`,
-      `https://saldo-siaga-api.vercel.app/user/${uid}/income/total/all/months`,
-      `https://saldo-siaga-api.vercel.app/user/${uid}/expense/total/all/months`,
+      `${baseUrl}/user/${uid}/income/total`,
+      `${baseUrl}/user/${uid}/expense/total`,
+      `${baseUrl}/user/${uid}/income/total?year=${thisYear}&month=${thisMonth}`,
+      `${baseUrl}/user/${uid}/expense/total?year=${thisYear}&month=${thisMonth}`,
+      `${baseUrl}/user/${uid}/saving/total`,
+      `${baseUrl}/user/${uid}/debt/total`,
+      `${baseUrl}/user/${uid}/income/total/all/months`,
+      `${baseUrl}/user/${uid}/expense/total/all/months`,
     ];
 
     const [
@@ -91,6 +92,10 @@ export default function Home() {
     incomes: income.total,
     expenses: expenses[index].total,
   }));
+  const xxl = useMediaQuery(useTheme().breakpoints.up("xl"));
+  const xl = useMediaQuery(useTheme().breakpoints.up("lg"));
+  const lg = useMediaQuery(useTheme().breakpoints.up("md"));
+  const md = useMediaQuery(useTheme().breakpoints.up("sm"));
   return (
     <div className="px-4">
       <Box className="my-24 text-center">

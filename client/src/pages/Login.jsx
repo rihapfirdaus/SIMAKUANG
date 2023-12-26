@@ -12,6 +12,7 @@ import EmailField from "../components/EmailField";
 import PasswordField from "../components/PasswordField";
 
 export async function action({ request }) {
+  const baseUrl = import.meta.env.VITE_REACT_APP_SERVER_BASE_URL;
   const formData = await request.formData();
   const updates = Object.fromEntries(formData);
 
@@ -20,9 +21,7 @@ export async function action({ request }) {
 
   try {
     if (LoginFormValidation(email, password)) {
-      const response = await axios.get(
-        `https://saldo-siaga-api.vercel.app/user/${email}`
-      );
+      const response = await axios.get(`${baseUrl}/user/${email}`);
 
       const user = response.data;
       const userId = user._id;

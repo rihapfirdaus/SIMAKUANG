@@ -9,18 +9,23 @@ export default ({ label, name, value, setValue, isDateline, year, month }) => {
   const breakpoint = useMediaQuery(useTheme().breakpoints.up("md"));
 
   const getDatePickerValue = () => {
-    if (year) {
-      return moment(new Date(value, 0, 1));
-    } else if (month) {
-      return moment(new Date(new Date().getFullYear(), value, 1));
+    if (value) {
+      if (year) {
+        return moment(new Date(value, 0, 1));
+      } else if (month) {
+        return moment(new Date(new Date().getFullYear(), value, 1));
+      } else {
+        return moment(value);
+      }
     } else {
-      return moment(value);
+      return null;
     }
   };
 
   return (
     <LocalizationProvider dateAdapter={AdapterMoment}>
       <DatePicker
+        emptyLabel=""
         label={label}
         disablePast={month || year ? false : isDateline ? true : false}
         disableFuture={month || year ? false : isDateline ? false : true}

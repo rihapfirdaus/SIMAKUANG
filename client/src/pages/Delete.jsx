@@ -20,20 +20,16 @@ import {
 } from "react-router-dom";
 
 import axios from "axios";
-import {
-  CloseRounded,
-  ErrorOutlineRounded,
-  WarningAmberRounded,
-} from "@mui/icons-material";
-import { Stack, textAlign } from "@mui/system";
+import { CloseRounded, ErrorOutlineRounded } from "@mui/icons-material";
 
 export async function action({ params }) {
+  const baseUrl = import.meta.env.VITE_REACT_APP_SERVER_BASE_URL;
   const uid = params?.userId;
   const id = params?.id;
   const type = params?.type;
 
   try {
-    const apiUrl = `https://saldo-siaga-api.vercel.app/user/${uid}/${type}/${id}`;
+    const apiUrl = `${baseUrl}/user/${uid}/${type}/${id}`;
     await axios.delete(apiUrl);
     return { status: "201", message: "Data berhasil dihapus" };
   } catch (error) {
