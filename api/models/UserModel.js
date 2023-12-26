@@ -6,6 +6,9 @@ const User = mongoose.Schema({
     required: true,
     unique: true,
   },
+  photoURL: {
+    type: String,
+  },
   email: {
     type: String,
     required: true,
@@ -24,7 +27,15 @@ const User = mongoose.Schema({
     type: String,
     lowercase: true,
   },
-  photoURL: {
+  birthdate: {
+    type: Date,
+  },
+  gender: {
+    type: String,
+    enum: ["Undefined", "Laki-laki", "Perempuan"],
+    default: "Undefined",
+  },
+  address: {
     type: String,
   },
   role: {
