@@ -3,8 +3,9 @@ const Debt = require("../models/DebtModel.js");
 // Create a new debt
 const createDebt = async (req, res) => {
   const userId = req.params.userId;
-  const { debtor, creditor, amount, category, dueDate, status, note } =
+  const { debtor, creditor, amount, category, date, dueDate, status, note } =
     req.body;
+  console.log(req.body);
 
   try {
     const debt = new Debt({
@@ -22,7 +23,8 @@ const createDebt = async (req, res) => {
 
     return res.status(201).json({ message: "Debt created successfully", debt });
   } catch (error) {
-    console.error(error);
+    console.log(error);
+    // console.error(error);
     return res.status(500).json({ message: "Error creating debt." });
   }
 };
