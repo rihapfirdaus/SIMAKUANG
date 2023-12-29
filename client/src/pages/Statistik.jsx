@@ -36,6 +36,8 @@ export async function loader({ params }) {
       `${baseUrl}/user/${uid}/debt/category?year=${thisYear}&month=${thisMonth}`,
       `${baseUrl}/user/${uid}/debt/total/all/months`,
       `${baseUrl}/user/${uid}/saving/total?year=${thisYear}`,
+      `${baseUrl}/user/${uid}/saving/total?year=${thisYear}&category=decrease`,
+      `${baseUrl}/user/${uid}/saving/total?year=${thisYear}&category=increase`,
       `${baseUrl}/user/${uid}/saving/total?year=${thisYear}&month=${thisMonth}`,
       `${baseUrl}/user/${uid}/saving/category?year=${thisYear}&month=${thisMonth}`,
       `${baseUrl}/user/${uid}/saving/total/all/months`,
@@ -55,6 +57,8 @@ export async function loader({ params }) {
       debtByCategory,
       debtMonthly,
       savingByYear,
+      savingByDecrease,
+      savingByIncrease,
       savingByMonth,
       savingByCategory,
       savingMonthly,
@@ -73,6 +77,8 @@ export async function loader({ params }) {
     const debtsByCategory = debtByCategory.data;
     const debtsMonthly = debtMonthly.data.monthlyDebts;
     const savingsByYear = savingByYear.data.saving;
+    const savingsByDecrease = savingByDecrease.data.saving;
+    const savingsByIncrease = savingByIncrease.data.saving;
     const savingsByMonth = savingByMonth.data.saving;
     const savingsByCategory = savingByCategory.data;
     const savingsMonthly = savingMonthly.data.monthlySavings;
@@ -91,6 +97,8 @@ export async function loader({ params }) {
       debtsByCategory,
       debtsMonthly,
       savingsByYear,
+      savingsByDecrease,
+      savingsByIncrease,
       savingsByMonth,
       savingsByCategory,
       savingsMonthly,
@@ -116,6 +124,8 @@ export default () => {
     debtsByCategory,
     debtsMonthly,
     savingsByYear,
+    savingsByDecrease,
+    savingsByIncrease,
     savingsByMonth,
     savingsByCategory,
     savingsMonthly,
@@ -189,9 +199,9 @@ export default () => {
           <Statistics
             label="Tabungan"
             labelrecap1="Total Tabungan Masuk"
-            recap1={savingsByYear}
+            recap1={savingsByIncrease}
             labelrecap2="Total Tabungan Keluar"
-            recap2={savingsByMonth}
+            recap2={savingsByDecrease}
             pie={savingsByCategory}
             bar={savingsMonthly}
           />

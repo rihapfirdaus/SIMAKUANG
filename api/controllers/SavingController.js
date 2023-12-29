@@ -158,7 +158,18 @@ const getTotalSavingByUser = async (req, res) => {
 
     const savings = await Saving.find(match);
 
-    const totalSaving = savings.reduce((sum, saving) => sum + saving.amount, 0);
+    let totalIncrease = 0;
+    let totalDecrease = 0;
+
+    savings.forEach((saving) => {
+      if (saving.category === "increase") {
+        totalIncrease += saving.amount;
+      } else if (saving.category === "decrease") {
+        totalDecrease += saving.amount;
+      }
+    });
+
+    const totalSaving = category ? savings.reduce((sum, saving) => sum + saving.amount, 0) : totalIncrease - totalDecrease;
 
     return res.status(200).json({ saving: totalSaving });
   } catch (error) {
@@ -183,23 +194,34 @@ const getMonthlySavingsByYear = async (req, res) => {
 
     const savings = await Saving.find(match);
 
-    const groupedSavings = {};
+    let groupedSavings = {};
+
     savings.forEach((saving) => {
       const month = saving.date.getMonth() + 1;
       if (!groupedSavings[month]) {
-        groupedSavings[month] = { total: 0, savings: [] };
+        groupedSavings[month] = { totalIncrease: 0, totalDecrease: 0, savings: [] };
       }
-      groupedSavings[month].total += saving.amount;
+
+      if (saving.category === "increase") {
+        groupedSavings[month].totalIncrease += saving.amount;
+      } else if (saving.category === "decrease") {
+        groupedSavings[month].totalDecrease += saving.amount;
+      }
+
+      groupedSavings[month].savings.push(saving);
     });
 
     const monthlySavings = [];
     for (let month = 1; month <= 12; month++) {
       if (!groupedSavings[month]) {
-        groupedSavings[month] = { total: 0, savings: [] };
+        groupedSavings[month] = { totalIncrease: 0, totalDecrease: 0, savings: [] };
       }
+
+      const netSavings = groupedSavings[month].totalIncrease - groupedSavings[month].totalDecrease;
+
       monthlySavings.push({
         month: Number(month),
-        total: groupedSavings[month].total,
+        total: netSavings,
       });
     }
 

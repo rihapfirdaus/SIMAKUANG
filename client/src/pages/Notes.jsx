@@ -146,7 +146,7 @@ export async function action({ request, params }) {
         note,
       };
     }
-    const apiUrl = `http://localhost:5000/user/${uid}/${type}`;
+    const apiUrl = `${baseUrl}/user/${uid}/${type}`;
     await axios.post(apiUrl, requestBody);
     return { status: "201", message: "Data berhasil ditambahkan" };
   } catch (error) {
@@ -273,14 +273,35 @@ export default () => {
       editable: true,
       valueFormatter: (params) => dateFormatter.format(new Date(params.value)),
     },
-    {
-      field: "category",
-      headerName: "Kategori",
-      flex: 0.5,
-      align: "left",
-      editable: true,
-      headerAlign: "center",
-    },
+    ...(type === "debt"
+      ? [
+          {
+            field: "debtor",
+            headerName: "Pemberi",
+            flex: 0.5,
+            align: "left",
+            editable: true,
+            headerAlign: "center",
+          },
+          {
+            field: "creditor",
+            headerName: "Peminjam",
+            flex: 0.5,
+            align: "left",
+            editable: true,
+            headerAlign: "center",
+          },
+        ]
+      : [
+          {
+            field: "category",
+            headerName: "Kategori",
+            flex: 0.5,
+            align: "left",
+            editable: true,
+            headerAlign: "center",
+          },
+        ]),
     {
       field: "amount",
       headerName: "Jumlah",
@@ -304,28 +325,27 @@ export default () => {
       headerName: "Actions",
       headerAlign: "center",
       cellClassName: "actions",
-      getActions: ({ id }) => {
-        return [
-          <GridActionsCellItem
-            icon={<EditIcon />}
-            component={Link}
-            to={`/app/${userId}/notes/${type}/update/${id}`}
-            type="submit"
-            label="Edit"
-            color="inherit"
-          />,
-          <GridActionsCellItem
-            icon={<DeleteIcon />}
-            component={Link}
-            to={`/app/${userId}/notes/${type}/delete/${id}`}
-            type="submit"
-            label="Delete"
-            color="inherit"
-          />,
-        ];
-      },
+      getActions: ({ id }) => [
+        <GridActionsCellItem
+          icon={<EditIcon />}
+          component={Link}
+          to={`/app/${userId}/notes/${type}/update/${id}`}
+          type="submit"
+          label="Edit"
+          color="inherit"
+        />,
+        <GridActionsCellItem
+          icon={<DeleteIcon />}
+          component={Link}
+          to={`/app/${userId}/notes/${type}/delete/${id}`}
+          type="submit"
+          label="Delete"
+          color="inherit"
+        />,
+      ],
     },
   ];
+  
 
   const xLabels = [
     "Jan",
